@@ -5,13 +5,13 @@ import {
   Alert,
   Modal,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { BorderRadius, Colors, globalStyles, Spacing } from '../constants/Theme';
+import { Colors, globalStyles } from '../constants/Theme';
+import { timeTrackerStyles } from '../styles/TimeTrackerStyles';
 
 interface TimeTrackerProps {
   isYesterday?: boolean;
@@ -31,7 +31,6 @@ interface TimeRange {
 const MINUTES_PER_INTERVAL = 20;
 const INTERVALS_PER_HOUR = 60 / MINUTES_PER_INTERVAL; // 3 intervals per hour
 const TOTAL_INTERVALS = 24 * INTERVALS_PER_HOUR; // 72 total intervals in a day
-const INTERVAL_HEIGHT = 50; // Height of each 20-minute interval slot
 
 const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose }) => {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(
@@ -221,33 +220,33 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
       <View key={slot.time}>
         {/* Hour divider line */}
         {isFirstIntervalOfHour && index > 0 && (
-          <View style={styles.hourDivider} />
+          <View style={timeTrackerStyles.hourDivider} />
         )}
         
         <TouchableOpacity
           style={[
-            styles.calendarInterval,
-            isInRange && styles.calendarIntervalInRange,
-            isCurrentlySelected && styles.calendarIntervalSelected,
+            timeTrackerStyles.calendarInterval,
+            isInRange && timeTrackerStyles.calendarIntervalInRange,
+            isCurrentlySelected && timeTrackerStyles.calendarIntervalSelected,
           ]}
           onPress={() => handleSlotPress(slot.time)}
           onPressIn={() => updateSelectionPreview(slot.time)}
         >
-          <View style={styles.timeLabel}>
+          <View style={timeTrackerStyles.timeLabel}>
             <Text style={[
-              styles.timeText,
-              (isInRange || isCurrentlySelected) && styles.timeTextActive,
+              timeTrackerStyles.timeText,
+              (isInRange || isCurrentlySelected) && timeTrackerStyles.timeTextActive,
             ]}>
               {formatTime(slot.time)}
             </Text>
           </View>
           <View style={[
-            styles.intervalContent,
-            isInRange && styles.intervalContentInRange,
-            isCurrentlySelected && styles.intervalContentSelected,
+            timeTrackerStyles.intervalContent,
+            isInRange && timeTrackerStyles.intervalContentInRange,
+            isCurrentlySelected && timeTrackerStyles.intervalContentSelected,
           ]}>
             {(isInRange || isCurrentlySelected) && (
-              <Text style={styles.selectedIndicator}>🌿</Text>
+              <Text style={timeTrackerStyles.selectedIndicator}>🌿</Text>
             )}
           </View>
         </TouchableOpacity>
@@ -258,42 +257,42 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
   return (
     <LinearGradient
       colors={[Colors.gradientStart, Colors.gradientEnd]}
-      style={styles.container}
+      style={timeTrackerStyles.container}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={onClose}>
-            <Text style={styles.backButtonText}>← Back</Text>
+      <ScrollView contentContainerStyle={timeTrackerStyles.scrollContent}>
+        <View style={timeTrackerStyles.header}>
+          <TouchableOpacity style={timeTrackerStyles.backButton} onPress={onClose}>
+            <Text style={timeTrackerStyles.backButtonText}>← Back</Text>
           </TouchableOpacity>
-          <View style={styles.headerContent}>
-            <Text style={styles.title}>Track Your Time Outside</Text>
-            <Text style={styles.date}>{getCurrentDate()}</Text>
+          <View style={timeTrackerStyles.headerContent}>
+            <Text style={timeTrackerStyles.title}>Track Your Time Outside</Text>
+            <Text style={timeTrackerStyles.date}>{getCurrentDate()}</Text>
           </View>
         </View>
 
-        <View style={[globalStyles.card, styles.instructionCard]}>
-          <Text style={styles.instructionTitle}>How to track your time:</Text>
-          <Text style={styles.instructionText}>
+        <View style={[globalStyles.card, timeTrackerStyles.instructionCard]}>
+          <Text style={timeTrackerStyles.instructionTitle}>How to track your time:</Text>
+          <Text style={timeTrackerStyles.instructionText}>
             • Tap a start time and then an end time{'\n'}
             • Use &quot;Custom Time&quot; for precise timing{'\n'}
           </Text>
         </View>
 
-        <View style={[globalStyles.card, styles.timeGrid]}>
-          <Text style={styles.gridTitle}>Select Hours (24-hour format)</Text>
+        <View style={[globalStyles.card, timeTrackerStyles.timeGrid]}>
+          <Text style={timeTrackerStyles.gridTitle}>Select Hours (24-hour format)</Text>
           
           {/* AM/PM Toggle Tabs */}
-          <View style={styles.timeModeToggle}>
+          <View style={timeTrackerStyles.timeModeToggle}>
             <TouchableOpacity
               style={[
-                styles.timeModeTab,
-                timeMode === 'AM' && styles.timeModeTabActive
+                timeTrackerStyles.timeModeTab,
+                timeMode === 'AM' && timeTrackerStyles.timeModeTabActive
               ]}
               onPress={() => setTimeMode('AM')}
             >
               <Text style={[
-                styles.timeModeTabText,
-                timeMode === 'AM' && styles.timeModeTabTextActive
+                timeTrackerStyles.timeModeTabText,
+                timeMode === 'AM' && timeTrackerStyles.timeModeTabTextActive
               ]}>
                 AM (00:00 - 11:40)
               </Text>
@@ -301,14 +300,14 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
             
             <TouchableOpacity
               style={[
-                styles.timeModeTab,
-                timeMode === 'PM' && styles.timeModeTabActive
+                timeTrackerStyles.timeModeTab,
+                timeMode === 'PM' && timeTrackerStyles.timeModeTabActive
               ]}
               onPress={() => setTimeMode('PM')}
             >
               <Text style={[
-                styles.timeModeTabText,
-                timeMode === 'PM' && styles.timeModeTabTextActive
+                timeTrackerStyles.timeModeTabText,
+                timeMode === 'PM' && timeTrackerStyles.timeModeTabTextActive
               ]}>
                 PM (12:00 - 23:40)
               </Text>
@@ -316,58 +315,58 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
           </View>
           
           {isSelecting && (
-            <View style={styles.selectionControls}>
-              <Text style={styles.selectionHint}>
+            <View style={timeTrackerStyles.selectionControls}>
+              <Text style={timeTrackerStyles.selectionHint}>
                 Now tap the end time to complete your selection
               </Text>
               <TouchableOpacity
-                style={styles.cancelSelectionButton}
+                style={timeTrackerStyles.cancelSelectionButton}
                 onPress={cancelSelection}
               >
-                <Text style={styles.cancelSelectionText}>Cancel Selection</Text>
+                <Text style={timeTrackerStyles.cancelSelectionText}>Cancel Selection</Text>
               </TouchableOpacity>
             </View>
           )}
           
-          <View style={styles.calendarContainer}>
+          <View style={timeTrackerStyles.calendarContainer}>
             {getFilteredTimeSlots().map((slot, index) => renderTimeSlot(slot, index))}
           </View>
         </View>
 
         {selectedRanges.length > 0 && (
-          <View style={[globalStyles.card, styles.selectedRanges]}>
-            <Text style={styles.rangesTitle}>Selected Time Ranges:</Text>
+          <View style={[globalStyles.card, timeTrackerStyles.selectedRanges]}>
+            <Text style={timeTrackerStyles.rangesTitle}>Selected Time Ranges:</Text>
             {selectedRanges.map((range, index) => (
-              <View key={index} style={styles.rangeItem}>
-                <Text style={styles.rangeText}>
+              <View key={index} style={timeTrackerStyles.rangeItem}>
+                <Text style={timeTrackerStyles.rangeText}>
                   {formatTimeRange(range.start, range.end)}
                 </Text>
                 <TouchableOpacity
-                  style={styles.removeRange}
+                  style={timeTrackerStyles.removeRange}
                   onPress={() => removeRange(index)}
                 >
-                  <Text style={styles.removeRangeText}>×</Text>
+                  <Text style={timeTrackerStyles.removeRangeText}>×</Text>
                 </TouchableOpacity>
               </View>
             ))}
           </View>
         )}
 
-        <View style={styles.actionButtons}>
+        <View style={timeTrackerStyles.actionButtons}>
           <TouchableOpacity
-            style={[globalStyles.button, styles.customTimeButton]}
+            style={[globalStyles.button, timeTrackerStyles.customTimeButton]}
             onPress={() => setShowCustomTime(true)}
           >
-            <Text style={[globalStyles.buttonText, styles.customTimeText]}>
+            <Text style={[globalStyles.buttonText, timeTrackerStyles.customTimeText]}>
               ⏱️ Custom Time
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[globalStyles.button, styles.submitButton]}
+            style={[globalStyles.button, timeTrackerStyles.submitButton]}
             onPress={handleSubmit}
           >
-            <Text style={[globalStyles.buttonText, styles.submitText]}>
+            <Text style={[globalStyles.buttonText, timeTrackerStyles.submitText]}>
               🌿 Record Time Outside
             </Text>
           </TouchableOpacity>
@@ -381,15 +380,15 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
         animationType="fade"
         onRequestClose={() => setShowCustomTime(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={[globalStyles.card, styles.modalContent]}>
-            <Text style={styles.modalTitle}>Add Custom Time Range</Text>
+        <View style={timeTrackerStyles.modalOverlay}>
+          <View style={[globalStyles.card, timeTrackerStyles.modalContent]}>
+            <Text style={timeTrackerStyles.modalTitle}>Add Custom Time Range</Text>
             
-            <View style={styles.customTimeInputs}>
-              <View style={styles.timeInputGroup}>
-                <Text style={styles.modalTimeLabel}>Start Time (HH:MM)</Text>
+            <View style={timeTrackerStyles.customTimeInputs}>
+              <View style={timeTrackerStyles.timeInputGroup}>
+                <Text style={timeTrackerStyles.modalTimeLabel}>Start Time (HH:MM)</Text>
                 <TextInput
-                  style={styles.timeInput}
+                  style={[globalStyles.input, timeTrackerStyles.timeInput]}
                   value={customStartTime}
                   onChangeText={setCustomStartTime}
                   placeholder="14:30"
@@ -398,10 +397,10 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
                 />
               </View>
               
-              <View style={styles.timeInputGroup}>
-                <Text style={styles.modalTimeLabel}>End Time (HH:MM)</Text>
+              <View style={timeTrackerStyles.timeInputGroup}>
+                <Text style={timeTrackerStyles.modalTimeLabel}>End Time (HH:MM)</Text>
                 <TextInput
-                  style={styles.timeInput}
+                  style={[globalStyles.input, timeTrackerStyles.timeInput]}
                   value={customEndTime}
                   onChangeText={setCustomEndTime}
                   placeholder="16:45"
@@ -411,16 +410,16 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
               </View>
             </View>
 
-            <View style={styles.modalButtons}>
+            <View style={timeTrackerStyles.modalButtons}>
               <TouchableOpacity
-                style={[globalStyles.button, globalStyles.secondaryButton, styles.modalCancelButton]}
+                style={[globalStyles.button, globalStyles.secondaryButton, timeTrackerStyles.modalCancelButton]}
                 onPress={() => setShowCustomTime(false)}
               >
                 <Text style={globalStyles.secondaryButtonText}>Cancel</Text>
               </TouchableOpacity>
               
               <TouchableOpacity
-                style={[globalStyles.button, styles.modalAddButton]}
+                style={[globalStyles.button, timeTrackerStyles.modalAddButton]}
                 onPress={addCustomTimeRange}
               >
                 <Text style={globalStyles.buttonText}>Add Range</Text>
@@ -432,310 +431,5 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
     </LinearGradient>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingTop: 60,
-    paddingBottom: Spacing.xl,
-  },
-  header: {
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.lg,
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    marginBottom: Spacing.md,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: BorderRadius.sm,
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: Colors.primary,
-    fontWeight: '600',
-  },
-  headerContent: {
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.text,
-    textAlign: 'center',
-    marginBottom: Spacing.xs,
-  },
-  date: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-  instructionCard: {
-    marginHorizontal: Spacing.lg,
-    marginBottom: Spacing.lg,
-  },
-  instructionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: Spacing.sm,
-  },
-  instructionText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    lineHeight: 20,
-  },
-  timeGrid: {
-    marginHorizontal: Spacing.lg,
-    marginBottom: Spacing.lg,
-  },
-  gridTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
-    textAlign: 'center',
-    marginBottom: Spacing.md,
-  },
-  timeModeToggle: {
-    flexDirection: 'row',
-    marginBottom: Spacing.md,
-    backgroundColor: Colors.surfaceSecondary,
-    borderRadius: BorderRadius.md,
-    padding: 4,
-  },
-  timeModeTab: {
-    flex: 1,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  timeModeTabActive: {
-    backgroundColor: Colors.primary,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  timeModeTabText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-  timeModeTabTextActive: {
-    color: Colors.surface,
-    fontWeight: 'bold',
-  },
-  selectionHint: {
-    fontSize: 14,
-    color: Colors.primary,
-    textAlign: 'center',
-    marginBottom: Spacing.sm,
-    fontStyle: 'italic',
-  },
-  selectionControls: {
-    alignItems: 'center',
-    marginBottom: Spacing.md,
-  },
-  cancelSelectionButton: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    backgroundColor: 'rgba(220, 53, 69, 0.1)',
-    borderRadius: BorderRadius.sm,
-    marginTop: Spacing.sm,
-  },
-  cancelSelectionText: {
-    color: Colors.error,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  calendarContainer: {
-    flex: 1,
-  },
-  hourDivider: {
-    height: 2,
-    backgroundColor: Colors.primary,
-    opacity: 0.6,
-    marginVertical: 4,
-    borderRadius: 1,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  calendarInterval: {
-    flexDirection: 'row',
-    height: INTERVAL_HEIGHT,
-    marginBottom: 4, // Add padding between hours
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.sm,
-    overflow: 'hidden',
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-  },
-  calendarIntervalSelected: {
-    backgroundColor: Colors.primaryLight,
-    elevation: 3,
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    transform: [{ scale: 1.02 }],
-  },
-  calendarIntervalInRange: {
-    backgroundColor: Colors.timeSlotActive,
-    elevation: 2,
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-  },
-  timeLabel: {
-    width: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.surfaceSecondary,
-    borderRightWidth: 1,
-    borderRightColor: Colors.timeSlot,
-  },
-  timeText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-  },
-  timeTextActive: {
-    color: Colors.primary, // Changed to ensure visibility
-    fontWeight: 'bold',
-  },
-  intervalContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.md,
-    position: 'relative',
-  },
-  intervalContentSelected: {
-    backgroundColor: 'rgba(74, 124, 89, 0.1)',
-  },
-  intervalContentInRange: {
-    backgroundColor: 'rgba(74, 124, 89, 0.2)',
-  },
-  selectedIndicator: {
-    fontSize: 18,
-    zIndex: 1,
-  },
-  selectedRanges: {
-    marginHorizontal: Spacing.lg,
-    marginBottom: Spacing.lg,
-  },
-  rangesTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: Spacing.md,
-  },
-  rangeItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    backgroundColor: Colors.surfaceSecondary,
-    borderRadius: BorderRadius.sm,
-    marginBottom: Spacing.sm,
-  },
-  rangeText: {
-    fontSize: 16,
-    color: Colors.text,
-    fontWeight: '500',
-  },
-  removeRange: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: Colors.error,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  removeRangeText: {
-    fontSize: 16,
-    color: Colors.surface,
-    fontWeight: 'bold',
-  },
-  actionButtons: {
-    paddingHorizontal: Spacing.lg,
-  },
-  customTimeButton: {
-    marginBottom: Spacing.md,
-    backgroundColor: Colors.mustard, // Soft mustardy yellow to match Dashboard
-  },
-  customTimeText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.surface, // White text for contrast
-  },
-  submitButton: {
-    paddingVertical: Spacing.lg,
-  },
-  submitText: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-  },
-  modalContent: {
-    width: '100%',
-    maxWidth: 400,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.text,
-    textAlign: 'center',
-    marginBottom: Spacing.lg,
-  },
-  customTimeInputs: {
-    marginBottom: Spacing.lg,
-  },
-  timeInputGroup: {
-    marginBottom: Spacing.md,
-  },
-  modalTimeLabel: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: Spacing.xs,
-    fontWeight: '500',
-  },
-  timeInput: {
-    ...globalStyles.input,
-    fontSize: 18,
-    textAlign: 'center',
-    fontWeight: '600',
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  modalCancelButton: {
-    flex: 1,
-    marginRight: Spacing.sm,
-  },
-  modalAddButton: {
-    flex: 1,
-    marginLeft: Spacing.sm,
-  },
-});
 
 export default TimeTracker;
