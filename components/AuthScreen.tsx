@@ -2,17 +2,17 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Colors, Spacing, globalStyles } from '../constants/Theme';
+import { Colors, globalStyles } from '../constants/Theme';
 import { useAuth } from '../context/AuthContext';
+import { authScreenStyles } from '../styles/AuthScreenStyles';
 
 interface AuthScreenProps {
   isLogin: boolean;
@@ -69,22 +69,22 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ isLogin, onToggleMode }) => {
   return (
     <LinearGradient
       colors={[Colors.gradientStart, Colors.gradientEnd]}
-      style={styles.container}
+      style={authScreenStyles.container}
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardContainer}
+        style={authScreenStyles.keyboardContainer}
       >
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={styles.logo}>🌿</Text>
+        <View style={authScreenStyles.content}>
+          <View style={authScreenStyles.header}>
+            <Text style={authScreenStyles.logo}>🌿</Text>
             <Text style={globalStyles.title}>Nature Buddy</Text>
-            <Text style={styles.tagline}>
+            <Text style={authScreenStyles.tagline}>
               {isLogin ? 'Welcome back!' : 'Start your outdoor journey'}
             </Text>
           </View>
 
-          <View style={styles.form}>
+          <View style={authScreenStyles.form}>
             <TextInput
               style={globalStyles.input}
               placeholder="Email"
@@ -105,7 +105,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ isLogin, onToggleMode }) => {
             />
 
             <TouchableOpacity
-              style={[globalStyles.button, styles.submitButton, isLoading && styles.disabled]}
+              style={[globalStyles.button, authScreenStyles.submitButton, isLoading && authScreenStyles.disabled]}
               onPress={handleSubmit}
               disabled={isLoading}
             >
@@ -115,12 +115,12 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ isLogin, onToggleMode }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.toggleButton}
+              style={authScreenStyles.toggleButton}
               onPress={handleToggleMode}
             >
-              <Text style={styles.toggleText}>
+              <Text style={authScreenStyles.toggleText}>
                 {isLogin ? "Don't have an account? " : 'Already have an account? '}
-                <Text style={styles.toggleTextBold}>
+                <Text style={authScreenStyles.toggleTextBold}>
                   {isLogin ? 'Sign Up' : 'Sign In'}
                 </Text>
               </Text>
@@ -131,54 +131,5 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ isLogin, onToggleMode }) => {
     </LinearGradient>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  keyboardContainer: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: Spacing.lg,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: Spacing.xxl,
-  },
-  logo: {
-    fontSize: 60,
-    marginBottom: Spacing.md,
-  },
-  tagline: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-  form: {
-    width: '100%',
-  },
-  submitButton: {
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.md,
-  },
-  disabled: {
-    opacity: 0.6,
-  },
-  toggleButton: {
-    alignItems: 'center',
-    paddingVertical: Spacing.md,
-  },
-  toggleText: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-  },
-  toggleTextBold: {
-    fontWeight: '600',
-    color: Colors.primary,
-  },
-});
 
 export default AuthScreen;
