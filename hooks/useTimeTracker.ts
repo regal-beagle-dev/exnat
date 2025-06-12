@@ -1,0 +1,199 @@
+import { useCallback, useState } from 'react';
+
+export interface TimeSlot {
+  time: number; // Time in hours (e.g., 1.33 for 01:20)
+  isSelected: boolean;
+}
+
+export interface TimeRange {
+  start: number;
+  end: number;
+}
+
+export const MINUTES_PER_INTERVAL = 20;
+export const INTERVALS_PER_HOUR = 60 / MINUTES_PER_INTERVAL; // 3 intervals per hour
+export const TOTAL_INTERVALS = 24 * INTERVALS_PER_HOUR; // 72 total intervals in a day
+
+export const useTimeTracker = () => {
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(
+    Array.from({ length: TOTAL_INTERVALS }, (_, i) => ({
+      time: i * (MINUTES_PER_INTERVAL / 60), // Convert interval index to hours
+      isSelected: false,
+    }))
+  );
+  const [selectedRanges, setSelectedRanges] = useState<TimeRange[]>([]);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectionStart, setSelectionStart] = useState<number | null>(null);
+
+  // Time formatting utilities
+  const formatTime = useCallback((time: number): string => {
+    const hours = Math.floor(time);
+    const minutes = Math.round((time - hours) * 60);
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }, []);
+
+  const parseTimeInput = useCallback((timeStr: string): number | null => {
+    const match = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+    if (!match) return null;
+    
+    const hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    
+    if (hours < 0 || hours >= 24 || minutes < 0 || minutes >= 60) return null;
+    
+    return hours + minutes / 60;
+  }, []);
+
+  const formatTimeRange = useCallback((start: number, end: number): string => {
+    const formatTime = (time: number) => {
+      const totalMinutes = Math.round(time * 60);
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    };
+    
+    return `${formatTime(start)} - ${formatTime(end)}`;
+  }, []);
+
+  // Time calculation utilities
+  const calculateIntervalBounds = useCallback((startTime: number, endTime: number) => {
+    const startInterval = Math.floor(Math.min(startTime, endTime) * INTERVALS_PER_HOUR);
+    const endInterval = Math.floor(Math.max(startTime, endTime) * INTERVALS_PER_HOUR);
+    
+    const finalStart = startInterval * (MINUTES_PER_INTERVAL / 60);
+    const finalEnd = (endInterval + 1) * (MINUTES_PER_INTERVAL / 60);
+    
+    return { finalStart, finalEnd };
+  }, []);
+
+  const calculateTotalTime = useCallback((): { hours: number; minutes: number; totalHours: number } => {
+    const totalHours = selectedRanges.reduce((sum, range) => sum + (range.end - range.start), 0);
+    const hours = Math.floor(totalHours);
+    const minutes = Math.round((totalHours - hours) * 60);
+    
+    return { hours, minutes, totalHours };
+  }, [selectedRanges]);
+
+  // Selection management
+  const updateSelectionPreview = useCallback((time: number) => {
+    if (isSelecting && selectionStart !== null) {
+      const { finalStart, finalEnd } = calculateIntervalBounds(selectionStart, time);
+      
+      setTimeSlots(prev => prev.map(slot => ({
+        ...slot,
+        isSelected: slot.time >= finalStart && slot.time < finalEnd
+      })));
+    }
+  }, [isSelecting, selectionStart, calculateIntervalBounds]);
+
+  const startSelection = useCallback((time: number) => {
+    setIsSelecting(true);
+    setSelectionStart(time);
+    setTimeSlots(prev =>
+      prev.map(slot => ({
+        ...slot,
+        isSelected: slot.time === time,
+      }))
+    );
+  }, []);
+
+  const completeSelection = useCallback((time: number) => {
+    if (selectionStart !== null) {
+      const { finalStart, finalEnd } = calculateIntervalBounds(selectionStart, time);
+
+      setTimeSlots(prev =>
+        prev.map(slot => ({
+          ...slot,
+          isSelected: slot.time >= finalStart && slot.time < finalEnd,
+        }))
+      );
+
+      setTimeout(async () => {
+        setSelectedRanges(prev => [...prev, { start: finalStart, end: finalEnd }]);
+        setIsSelecting(false);
+        setSelectionStart(null);
+        setTimeSlots(prev => prev.map(slot => ({ ...slot, isSelected: false })));
+      }, 200);
+    }
+  }, [selectionStart, calculateIntervalBounds]);
+
+  const cancelSelection = useCallback(() => {
+    setIsSelecting(false);
+    setSelectionStart(null);
+    setTimeSlots(prev => prev.map(slot => ({ ...slot, isSelected: false })));
+  }, []);
+
+  // Range management
+  const isTimeInRange = useCallback((time: number): boolean => {
+    return selectedRanges.some(range => time >= range.start && time < range.end);
+  }, [selectedRanges]);
+
+  const addCustomTimeRange = useCallback((startTimeStr: string, endTimeStr: string): { success: boolean; error?: string } => {
+    const start = parseTimeInput(startTimeStr);
+    const end = parseTimeInput(endTimeStr);
+    
+    if (start === null || end === null) {
+      return { success: false, error: 'Please enter time in HH:MM format (e.g., 14:30)' };
+    }
+    
+    if (start >= end) {
+      return { success: false, error: 'End time must be after start time' };
+    }
+    
+    const newRange: TimeRange = { start, end };
+    setSelectedRanges(prev => [...prev, newRange]);
+    
+    return { success: true };
+  }, [parseTimeInput]);
+
+  const removeRange = useCallback((index: number) => {
+    setSelectedRanges(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const clearAllRanges = useCallback(() => {
+    setSelectedRanges([]);
+  }, []);
+
+  // Filtering utilities
+  const getFilteredTimeSlots = useCallback((timeMode: 'AM' | 'PM') => {
+    return timeSlots.filter(slot => {
+      const hour = Math.floor(slot.time);
+      if (timeMode === 'AM') {
+        return hour >= 0 && hour < 12;
+      } else {
+        return hour >= 12 && hour < 24;
+      }
+    });
+  }, [timeSlots]);
+
+  return {
+    // State
+    timeSlots,
+    selectedRanges,
+    isSelecting,
+    selectionStart,
+    
+    // Time formatting
+    formatTime,
+    parseTimeInput,
+    formatTimeRange,
+    
+    // Time calculations
+    calculateTotalTime,
+    
+    // Selection management
+    updateSelectionPreview,
+    startSelection,
+    completeSelection,
+    cancelSelection,
+    
+    // Range management
+    isTimeInRange,
+    addCustomTimeRange,
+    removeRange,
+    clearAllRanges,
+    
+    // Utilities
+    getFilteredTimeSlots,
+  };
+};

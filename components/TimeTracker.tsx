@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { Colors, globalStyles } from '../constants/Theme';
+import { useTimeTracker, type TimeSlot } from '../hooks/useTimeTracker';
 import { timeTrackerStyles } from '../styles/TimeTrackerStyles';
 
 interface TimeTrackerProps {
@@ -18,141 +19,52 @@ interface TimeTrackerProps {
   onClose: () => void;
 }
 
-interface TimeSlot {
-  time: number; // Time in hours (e.g., 1.33 for 01:20)
-  isSelected: boolean;
-}
-
-interface TimeRange {
-  start: number;
-  end: number;
-}
-
-const MINUTES_PER_INTERVAL = 20;
-const INTERVALS_PER_HOUR = 60 / MINUTES_PER_INTERVAL; // 3 intervals per hour
-const TOTAL_INTERVALS = 24 * INTERVALS_PER_HOUR; // 72 total intervals in a day
-
 const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose }) => {
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(
-    Array.from({ length: TOTAL_INTERVALS }, (_, i) => ({
-      time: i * (MINUTES_PER_INTERVAL / 60), // Convert interval index to hours
-      isSelected: false,
-    }))
-  );
-  const [selectedRanges, setSelectedRanges] = useState<TimeRange[]>([]);
-  const [isSelecting, setIsSelecting] = useState(false);
-  const [selectionStart, setSelectionStart] = useState<number | null>(null);
+  const {
+    selectedRanges,
+    isSelecting,
+    formatTime,
+    formatTimeRange,
+    calculateTotalTime,
+    updateSelectionPreview,
+    startSelection,
+    completeSelection,
+    cancelSelection,
+    isTimeInRange,
+    addCustomTimeRange,
+    removeRange,
+    getFilteredTimeSlots,
+  } = useTimeTracker();
+
   const [showCustomTime, setShowCustomTime] = useState(false);
   const [customStartTime, setCustomStartTime] = useState('');
   const [customEndTime, setCustomEndTime] = useState('');
   const [timeMode, setTimeMode] = useState<'AM' | 'PM'>('AM');
 
-  const formatTime = (time: number): string => {
-    const hours = Math.floor(time);
-    const minutes = Math.round((time - hours) * 60);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  };
-
-  const parseTimeInput = (timeStr: string): number | null => {
-    const match = timeStr.match(/^(\d{1,2}):(\d{2})$/);
-    if (!match) return null;
-    
-    const hours = parseInt(match[1], 10);
-    const minutes = parseInt(match[2], 10);
-    
-    if (hours < 0 || hours >= 24 || minutes < 0 || minutes >= 60) return null;
-    
-    return hours + minutes / 60;
-  };
-
-  const formatTimeRange = (start: number, end: number): string => {
-    const formatTime = (time: number) => {
-      const totalMinutes = Math.round(time * 60);
-      const hours = Math.floor(totalMinutes / 60);
-      const minutes = totalMinutes % 60;
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-    };
-    
-    return `${formatTime(start)} - ${formatTime(end)}`;
-  };
-
   const handleSlotPress = useCallback(async (time: number) => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (!isSelecting) {
-      setIsSelecting(true);
-      setSelectionStart(time);
-      setTimeSlots(prev =>
-        prev.map(slot => ({
-          ...slot,
-          isSelected: slot.time === time,
-        }))
-      );
-    } else if (selectionStart !== null) {
-      const startInterval = Math.floor(Math.min(selectionStart, time) * INTERVALS_PER_HOUR);
-      const endInterval = Math.floor(Math.max(selectionStart, time) * INTERVALS_PER_HOUR);
-
-      const finalStart = startInterval * (MINUTES_PER_INTERVAL / 60);
-      const finalEnd = (endInterval + 1) * (MINUTES_PER_INTERVAL / 60);
-
-      setTimeSlots(prev =>
-        prev.map(slot => ({
-          ...slot,
-          isSelected: slot.time >= finalStart && slot.time < finalEnd,
-        }))
-      );
-
-      setTimeout(async () => {
-        setSelectedRanges(prev => [...prev, { start: finalStart, end: finalEnd }]);
-        setIsSelecting(false);
-        setSelectionStart(null);
-        setTimeSlots(prev => prev.map(slot => ({ ...slot, isSelected: false })));
-        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      }, 200);
+      startSelection(time);
+    } else {
+      completeSelection(time);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
-  }, [isSelecting, selectionStart]);
+  }, [isSelecting, startSelection, completeSelection]);
 
-
-  const updateSelectionPreview = useCallback((time: number) => {
-    if (isSelecting && selectionStart !== null) {
-      const startInterval = Math.floor(Math.min(selectionStart, time) * INTERVALS_PER_HOUR);
-      const endInterval = Math.floor(Math.max(selectionStart, time) * INTERVALS_PER_HOUR);
-
-      const finalStart = startInterval * (MINUTES_PER_INTERVAL / 60);
-      const finalEnd = (endInterval + 1) * (MINUTES_PER_INTERVAL / 60);
-      
-      setTimeSlots(prev => prev.map(slot => ({
-        ...slot,
-        isSelected: slot.time >= finalStart && slot.time < finalEnd
-      })));
-    }
-  }, [isSelecting, selectionStart]);
-
-  const isTimeInRange = (time: number): boolean => {
-    return selectedRanges.some(range => time >= range.start && time < range.end);
-  };
-
-  const removeRange = async (index: number) => {
+  const handleRemoveRange = async (index: number) => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setSelectedRanges(prev => prev.filter((_, i) => i !== index));
+    removeRange(index);
   };
 
-  const addCustomTimeRange = async () => {
-    const start = parseTimeInput(customStartTime);
-    const end = parseTimeInput(customEndTime);
+  const handleAddCustomTimeRange = async () => {
+    const result = addCustomTimeRange(customStartTime, customEndTime);
     
-    if (start === null || end === null) {
-      Alert.alert('Invalid Time', 'Please enter time in HH:MM format (e.g., 14:30)');
+    if (!result.success) {
+      Alert.alert('Invalid Time', result.error);
       return;
     }
     
-    if (start >= end) {
-      Alert.alert('Invalid Range', 'End time must be after start time');
-      return;
-    }
-    
-    const newRange: TimeRange = { start, end };
-    setSelectedRanges(prev => [...prev, newRange]);
     setCustomStartTime('');
     setCustomEndTime('');
     setShowCustomTime(false);
@@ -160,11 +72,9 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
-  const cancelSelection = async () => {
+  const handleCancelSelection = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setIsSelecting(false);
-    setSelectionStart(null);
-    setTimeSlots(prev => prev.map(slot => ({ ...slot, isSelected: false })));
+    cancelSelection();
   };
 
   const handleSubmit = async () => {
@@ -175,10 +85,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
 
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     
-    // Calculate total time
-    const totalHours = selectedRanges.reduce((sum, range) => sum + (range.end - range.start), 0);
-    const hours = Math.floor(totalHours);
-    const minutes = Math.round((totalHours - hours) * 60);
+    const { hours, minutes } = calculateTotalTime();
     
     Alert.alert(
       'Time Recorded! 🌿',
@@ -200,21 +107,10 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
     });
   };
 
-  const getFilteredTimeSlots = () => {
-    return timeSlots.filter(slot => {
-      const hour = Math.floor(slot.time);
-      if (timeMode === 'AM') {
-        return hour >= 0 && hour < 12;
-      } else {
-        return hour >= 12 && hour < 24;
-      }
-    });
-  };
-
   const renderTimeSlot = (slot: TimeSlot, index: number) => {
     const isInRange = isTimeInRange(slot.time);
     const isCurrentlySelected = slot.isSelected;
-    const isFirstIntervalOfHour = (slot.time * INTERVALS_PER_HOUR) % INTERVALS_PER_HOUR === 0;
+    const isFirstIntervalOfHour = (slot.time * 3) % 3 === 0; // 3 intervals per hour
     
     return (
       <View key={slot.time}>
@@ -321,7 +217,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
               </Text>
               <TouchableOpacity
                 style={timeTrackerStyles.cancelSelectionButton}
-                onPress={cancelSelection}
+                onPress={handleCancelSelection}
               >
                 <Text style={timeTrackerStyles.cancelSelectionText}>Cancel Selection</Text>
               </TouchableOpacity>
@@ -329,7 +225,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
           )}
           
           <View style={timeTrackerStyles.calendarContainer}>
-            {getFilteredTimeSlots().map((slot, index) => renderTimeSlot(slot, index))}
+            {getFilteredTimeSlots(timeMode).map((slot, index) => renderTimeSlot(slot, index))}
           </View>
         </View>
 
@@ -343,7 +239,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
                 </Text>
                 <TouchableOpacity
                   style={timeTrackerStyles.removeRange}
-                  onPress={() => removeRange(index)}
+                  onPress={() => handleRemoveRange(index)}
                 >
                   <Text style={timeTrackerStyles.removeRangeText}>×</Text>
                 </TouchableOpacity>
@@ -420,7 +316,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
               
               <TouchableOpacity
                 style={[globalStyles.button, timeTrackerStyles.modalAddButton]}
-                onPress={addCustomTimeRange}
+                onPress={handleAddCustomTimeRange}
               >
                 <Text style={globalStyles.buttonText}>Add Range</Text>
               </TouchableOpacity>
