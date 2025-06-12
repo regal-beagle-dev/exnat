@@ -4,13 +4,13 @@ import React, { useState } from 'react';
 import {
   Alert,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { BorderRadius, Colors, globalStyles, Spacing } from '../constants/Theme';
+import { Colors, globalStyles } from '../constants/Theme';
 // import { useAuth } from '../context/AuthContext';
+import { dashboardStyles } from '../styles/DashboardStyles';
 import TimeTracker from './TimeTracker';
 
 const Dashboard: React.FC = () => {
@@ -82,78 +82,78 @@ const Dashboard: React.FC = () => {
   return (
     <LinearGradient
       colors={[Colors.gradientStart, Colors.gradientEnd]}
-      style={styles.container}
+      style={dashboardStyles.container}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
+      <ScrollView contentContainerStyle={dashboardStyles.scrollContent}>
+        <View style={dashboardStyles.header}>
+          <View style={dashboardStyles.headerContent}>
             <View>
-              <Text style={styles.greeting}>Hello, {user?.email?.split('@')[0]}! 🌱</Text>
-              <Text style={styles.date}>{getCurrentDate()}</Text>
+              <Text style={dashboardStyles.greeting}>Hello, {user?.email?.split('@')[0]}! 🌱</Text>
+              <Text style={dashboardStyles.date}>{getCurrentDate()}</Text>
             </View>
             <TouchableOpacity 
-              style={styles.logoutButton}
+              style={dashboardStyles.logoutButton}
               onPress={handleLogout}
             >
-              <Text style={styles.logoutText}>Sign Out</Text>
+              <Text style={dashboardStyles.logoutText}>Sign Out</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        <View style={styles.content}>
-          <View style={[globalStyles.card, styles.welcomeCard]}>
-            <Text style={styles.welcomeTitle}>Get out and enjoy the great outdoors!</Text>
-            <Text style={styles.welcomeSubtitle}>
+        <View style={dashboardStyles.content}>
+          <View style={[globalStyles.card, dashboardStyles.welcomeCard]}>
+            <Text style={dashboardStyles.welcomeTitle}>Get out and enjoy the great outdoors!</Text>
+            <Text style={dashboardStyles.welcomeSubtitle}>
               Track your outdoor moments and connect with nature
             </Text>
           </View>
 
-          <View style={styles.actionButtons}>
+          <View style={dashboardStyles.actionButtons}>
             <TouchableOpacity
-              style={[globalStyles.button, styles.primaryAction]}
+              style={[globalStyles.button, dashboardStyles.primaryAction]}
               onPress={() => handleTrackTime(false)}
             >
-              <Text style={styles.actionIcon}>📅</Text>
-              <Text style={[globalStyles.buttonText, styles.actionText]}>
+              <Text style={dashboardStyles.actionIcon}>📅</Text>
+              <Text style={[globalStyles.buttonText, dashboardStyles.actionText]}>
                 Track Today&apos;s Time
               </Text>
-              <Text style={styles.actionSubtext}>
+              <Text style={dashboardStyles.actionSubtext}>
                 Record your outdoor activities
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[globalStyles.button, styles.secondaryAction]}
+              style={[globalStyles.button, dashboardStyles.secondaryAction]}
               onPress={() => handleTrackTime(true)}
             >
-              <Text style={styles.actionIcon}>⏰</Text>
-              <Text style={[styles.actionText, styles.secondaryActionText]}>
+              <Text style={dashboardStyles.actionIcon}>⏰</Text>
+              <Text style={[dashboardStyles.actionText, dashboardStyles.secondaryActionText]}>
                 Track Yesterday
               </Text>
-              <Text style={[styles.actionSubtext, styles.secondaryActionSubtext]}>
+              <Text style={[dashboardStyles.actionSubtext, dashboardStyles.secondaryActionSubtext]}>
                 {getYesterdayDate().split(',')[0]}
               </Text>
             </TouchableOpacity>
           </View>
 
-          <View style={[globalStyles.card, styles.statsCard]}>
-            <Text style={styles.statsTitle}>Coming Soon</Text>
-            <View style={styles.statsGrid}>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>🏃‍♂️</Text>
-                <Text style={styles.statLabel}>Activity Tracking</Text>
+          <View style={[globalStyles.card, dashboardStyles.statsCard]}>
+            <Text style={dashboardStyles.statsTitle}>Coming Soon</Text>
+            <View style={dashboardStyles.statsGrid}>
+              <View style={dashboardStyles.statItem}>
+                <Text style={dashboardStyles.statValue}>🏃‍♂️</Text>
+                <Text style={dashboardStyles.statLabel}>Activity Tracking</Text>
               </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>👨‍👩‍👧‍👦</Text>
-                <Text style={styles.statLabel}>Family Buddies</Text>
+              <View style={dashboardStyles.statItem}>
+                <Text style={dashboardStyles.statValue}>👨‍👩‍👧‍👦</Text>
+                <Text style={dashboardStyles.statLabel}>Family Buddies</Text>
               </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>📈</Text>
-                <Text style={styles.statLabel}>Progress Stats</Text>
+              <View style={dashboardStyles.statItem}>
+                <Text style={dashboardStyles.statValue}>📈</Text>
+                <Text style={dashboardStyles.statLabel}>Progress Stats</Text>
               </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>🏆</Text>
-                <Text style={styles.statLabel}>Achievements</Text>
+              <View style={dashboardStyles.statItem}>
+                <Text style={dashboardStyles.statValue}>🏆</Text>
+                <Text style={dashboardStyles.statLabel}>Achievements</Text>
               </View>
             </View>
           </View>
@@ -162,131 +162,5 @@ const Dashboard: React.FC = () => {
     </LinearGradient>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingTop: 60,
-  },
-  header: {
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.lg,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  greeting: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: Spacing.xs,
-  },
-  date: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-  },
-  logoutButton: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.sm,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  logoutText: {
-    fontSize: 14,
-    color: Colors.primary,
-    fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: Spacing.lg,
-  },
-  welcomeCard: {
-    alignItems: 'center',
-    marginBottom: Spacing.xl,
-  },
-  welcomeTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.text,
-    textAlign: 'center',
-    marginBottom: Spacing.sm,
-  },
-  welcomeSubtitle: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  actionButtons: {
-    marginBottom: Spacing.xl,
-  },
-  primaryAction: {
-    marginBottom: Spacing.md,
-    paddingVertical: Spacing.lg,
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  secondaryAction: {
-    paddingVertical: Spacing.lg,
-    flexDirection: 'column',
-    alignItems: 'center',
-    backgroundColor: Colors.mustard, // Soft mustardy yellow
-  },
-  secondaryActionText: {
-    color: Colors.surface, // White text for contrast
-  },
-  secondaryActionSubtext: {
-    color: 'rgba(255, 255, 255, 0.9)', // Slightly transparent white
-  },
-  actionIcon: {
-    fontSize: 24,
-    marginBottom: Spacing.sm,
-  },
-  actionText: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: Spacing.xs,
-  },
-  actionSubtext: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-  },
-  statsCard: {
-    marginBottom: Spacing.xl,
-  },
-  statsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: Colors.text,
-    textAlign: 'center',
-    marginBottom: Spacing.lg,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  statItem: {
-    width: '48%',
-    alignItems: 'center',
-    marginBottom: Spacing.lg,
-  },
-  statValue: {
-    fontSize: 28,
-    marginBottom: Spacing.sm,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    fontWeight: '500',
-  },
-});
 
 export default Dashboard;
