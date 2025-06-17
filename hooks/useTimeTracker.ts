@@ -16,10 +16,17 @@ export const TOTAL_INTERVALS = 24 * INTERVALS_PER_HOUR; // 72 total intervals in
 
 export const useTimeTracker = () => {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(
-    Array.from({ length: TOTAL_INTERVALS }, (_, i) => ({
-      time: i * (MINUTES_PER_INTERVAL / 60), // Convert interval index to hours
-      isSelected: false,
-    }))
+    Array.from({ length: TOTAL_INTERVALS }, (_, i) => {
+      // Calculate hours and minutes precisely to avoid floating point errors
+      const totalMinutes = i * MINUTES_PER_INTERVAL;
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      
+      return {
+        time: hours + minutes / 60, // This ensures clean fractional representation
+        isSelected: false,
+      };
+    })
   );
   const [selectedRanges, setSelectedRanges] = useState<TimeRange[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
@@ -79,12 +86,22 @@ export const useTimeTracker = () => {
     if (isSelecting && selectionStart !== null) {
       const { finalStart, finalEnd } = calculateIntervalBounds(selectionStart, time);
       
+      // Debug logging for preview updates (development only)
+      if (__DEV__) {
+        console.log('Preview Update:', {
+          from: formatTime(selectionStart),
+          to: formatTime(time),
+          previewStart: formatTime(finalStart),
+          previewEnd: formatTime(finalEnd)
+        });
+      }
+      
       setTimeSlots(prev => prev.map(slot => ({
         ...slot,
         isSelected: slot.time >= finalStart && slot.time < finalEnd
       })));
     }
-  }, [isSelecting, selectionStart, calculateIntervalBounds]);
+  }, [isSelecting, selectionStart, calculateIntervalBounds, formatTime]);
 
   const startSelection = useCallback((time: number) => {
     setIsSelecting(true);
@@ -97,25 +114,49 @@ export const useTimeTracker = () => {
     );
   }, []);
 
+  // Helper function to check for overlapping ranges
+  const isRangeOverlapping = useCallback((newStart: number, newEnd: number): boolean => {
+    return selectedRanges.some(range => 
+      (newStart < range.end && newEnd > range.start) // Check for any overlap
+    );
+  }, [selectedRanges]);
+
   const completeSelection = useCallback((time: number) => {
     if (selectionStart !== null) {
       const { finalStart, finalEnd } = calculateIntervalBounds(selectionStart, time);
 
-      setTimeSlots(prev =>
-        prev.map(slot => ({
-          ...slot,
-          isSelected: slot.time >= finalStart && slot.time < finalEnd,
-        }))
-      );
+      // Debug logging to help identify issues (development only)
+      if (__DEV__) {
+        console.log('Time Selection Debug:', {
+          selectionStart: selectionStart,
+          endTime: time,
+          selectionStartFormatted: formatTime(selectionStart),
+          endTimeFormatted: formatTime(time),
+          resultStart: finalStart,
+          resultEnd: finalEnd,
+          resultStartFormatted: formatTime(finalStart),
+          resultEndFormatted: formatTime(finalEnd)
+        });
+      }
 
-      setTimeout(async () => {
-        setSelectedRanges(prev => [...prev, { start: finalStart, end: finalEnd }]);
+      // Check for overlapping ranges
+      if (isRangeOverlapping(finalStart, finalEnd)) {
+        if (__DEV__) {
+          console.warn('Range overlaps with existing selection, skipping');
+        }
         setIsSelecting(false);
         setSelectionStart(null);
         setTimeSlots(prev => prev.map(slot => ({ ...slot, isSelected: false })));
-      }, 200);
+        return;
+      }
+
+      // Immediately update the selected ranges without timeout to prevent race conditions
+      setSelectedRanges(prev => [...prev, { start: finalStart, end: finalEnd }]);
+      setIsSelecting(false);
+      setSelectionStart(null);
+      setTimeSlots(prev => prev.map(slot => ({ ...slot, isSelected: false })));
     }
-  }, [selectionStart, calculateIntervalBounds]);
+  }, [selectionStart, calculateIntervalBounds, formatTime, isRangeOverlapping]);
 
   const cancelSelection = useCallback(() => {
     setIsSelecting(false);
@@ -189,6 +230,7 @@ export const useTimeTracker = () => {
     
     // Range management
     isTimeInRange,
+    isRangeOverlapping,
     addCustomTimeRange,
     removeRange,
     clearAllRanges,

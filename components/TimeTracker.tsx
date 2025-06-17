@@ -23,6 +23,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
   const {
     selectedRanges,
     isSelecting,
+    selectionStart,
     formatTime,
     formatTimeRange,
     calculateTotalTime,
@@ -40,17 +41,31 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
   const [customStartTime, setCustomStartTime] = useState('');
   const [customEndTime, setCustomEndTime] = useState('');
   const [timeMode, setTimeMode] = useState<'AM' | 'PM'>('AM');
+  const [lastPressTime, setLastPressTime] = useState(0);
 
   const handleSlotPress = useCallback(async (time: number) => {
+    // Debounce rapid successive touches
+    const now = Date.now();
+    if (now - lastPressTime < 300) { // 300ms debounce
+      return;
+    }
+    setLastPressTime(now);
+
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (!isSelecting) {
+      if (__DEV__) {
+        console.log('Starting selection at:', formatTime(time));
+      }
       startSelection(time);
     } else {
+      if (__DEV__) {
+        console.log('Completing selection from:', formatTime(selectionStart!), 'to:', formatTime(time));
+      }
       completeSelection(time);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
-  }, [isSelecting, startSelection, completeSelection]);
+  }, [isSelecting, selectionStart, startSelection, completeSelection, formatTime, lastPressTime]);
 
   const handleRemoveRange = async (index: number) => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -110,7 +125,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
   const renderTimeSlot = (slot: TimeSlot, index: number) => {
     const isInRange = isTimeInRange(slot.time);
     const isCurrentlySelected = slot.isSelected;
-    const isFirstIntervalOfHour = (slot.time * 3) % 3 === 0; // 3 intervals per hour
+    const isFirstIntervalOfHour = Math.abs((slot.time * 3) % 3) < 0.001; // More robust floating point comparison
     
     return (
       <View key={slot.time}>
@@ -126,7 +141,13 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
             isCurrentlySelected && timeTrackerStyles.calendarIntervalSelected,
           ]}
           onPress={() => handleSlotPress(slot.time)}
-          onPressIn={() => updateSelectionPreview(slot.time)}
+          onPressIn={() => {
+            // Only update preview if we're in the middle of a selection
+            if (isSelecting) {
+              updateSelectionPreview(slot.time);
+            }
+          }}
+          activeOpacity={0.7}
         >
           <View style={timeTrackerStyles.timeLabel}>
             <Text style={[
