@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { BorderRadius, Colors, Spacing } from '../constants/Theme';
 
-const INTERVAL_HEIGHT = 50; // Height of each 20-minute interval slot
+const INTERVAL_HEIGHT = 38; // Height of each 20-minute interval slot - reduced for less scrolling
 
 export const timeTrackerStyles = StyleSheet.create({
   container: {
@@ -10,7 +10,7 @@ export const timeTrackerStyles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingTop: 60,
-    paddingBottom: Spacing.xl,
+    paddingBottom: 120,
   },
   header: {
     paddingHorizontal: Spacing.lg,
@@ -47,6 +47,8 @@ export const timeTrackerStyles = StyleSheet.create({
   instructionCard: {
     marginHorizontal: Spacing.lg,
     marginBottom: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
   instructionTitle: {
     fontSize: 18,
@@ -104,11 +106,12 @@ export const timeTrackerStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   selectionHint: {
-    fontSize: 14,
+    fontSize: 13,
     color: Colors.primary,
     textAlign: 'center',
     marginBottom: Spacing.sm,
     fontStyle: 'italic',
+    fontWeight: '500',
   },
   selectionControls: {
     alignItems: 'center',
@@ -130,21 +133,21 @@ export const timeTrackerStyles = StyleSheet.create({
     flex: 1,
   },
   hourDivider: {
-    height: 2,
+    height: 1, // Reduced height for less visual clutter
     backgroundColor: Colors.primary,
-    opacity: 0.6,
-    marginVertical: 4,
+    opacity: 0.4, // Reduced opacity
+    marginVertical: 2, // Reduced margin
     borderRadius: 1,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
     elevation: 1,
   },
   calendarInterval: {
     flexDirection: 'row',
     height: INTERVAL_HEIGHT,
-    marginBottom: 4, // Add padding between hours
+    marginBottom: 2, // Reduced padding between intervals for less scrolling
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.sm,
     overflow: 'hidden',
@@ -168,7 +171,7 @@ export const timeTrackerStyles = StyleSheet.create({
     shadowRadius: 3,
   },
   timeLabel: {
-    width: 80,
+    width: 70, // Reduced width to save space
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.surfaceSecondary,
@@ -176,7 +179,7 @@ export const timeTrackerStyles = StyleSheet.create({
     borderRightColor: Colors.timeSlot,
   },
   timeText: {
-    fontSize: 14,
+    fontSize: 12, // Reduced font size for more compact display
     fontWeight: '600',
     color: Colors.textSecondary,
   },
@@ -188,7 +191,7 @@ export const timeTrackerStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: Spacing.sm, // Reduced padding
     position: 'relative',
   },
   intervalContentSelected: {
@@ -198,7 +201,7 @@ export const timeTrackerStyles = StyleSheet.create({
     backgroundColor: 'rgba(74, 124, 89, 0.2)',
   },
   selectedIndicator: {
-    fontSize: 18,
+    fontSize: 16, // Reduced emoji size
     zIndex: 1,
   },
   selectedRanges: {
@@ -304,5 +307,36 @@ export const timeTrackerStyles = StyleSheet.create({
   modalAddButton: {
     flex: 1,
     marginLeft: Spacing.sm,
+  },
+  // Sticky cancel button for better accessibility
+  stickyCancelContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0, 0, 0, 0.1)',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    paddingBottom: 30, // Extra padding for safe area
+  },
+  stickyCancelButton: {
+    backgroundColor: Colors.error,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: BorderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: Colors.error,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  stickyCancelText: {
+    color: Colors.surface,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

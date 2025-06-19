@@ -191,12 +191,17 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
           <Text style={timeTrackerStyles.instructionTitle}>How to track your time:</Text>
           <Text style={timeTrackerStyles.instructionText}>
             • Tap a start time and then an end time{'\n'}
-            • Use &quot;Custom Time&quot; for precise timing{'\n'}
+            • Use &quot;Custom Time&quot; for precise timing
           </Text>
         </View>
 
         <View style={[globalStyles.card, timeTrackerStyles.timeGrid]}>
           <Text style={timeTrackerStyles.gridTitle}>Select Hours (24-hour format)</Text>
+          {isSelecting && (
+            <Text style={timeTrackerStyles.selectionHint}>
+              Now tap the end time to complete your selection
+            </Text>
+          )}
           
           {/* AM/PM Toggle Tabs */}
           <View style={timeTrackerStyles.timeModeToggle}>
@@ -230,20 +235,6 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
               </Text>
             </TouchableOpacity>
           </View>
-          
-          {isSelecting && (
-            <View style={timeTrackerStyles.selectionControls}>
-              <Text style={timeTrackerStyles.selectionHint}>
-                Now tap the end time to complete your selection
-              </Text>
-              <TouchableOpacity
-                style={timeTrackerStyles.cancelSelectionButton}
-                onPress={handleCancelSelection}
-              >
-                <Text style={timeTrackerStyles.cancelSelectionText}>Cancel Selection</Text>
-              </TouchableOpacity>
-            </View>
-          )}
           
           <View style={timeTrackerStyles.calendarContainer}>
             {getFilteredTimeSlots(timeMode).map((slot, index) => renderTimeSlot(slot, index))}
@@ -289,6 +280,18 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Sticky Cancel Button - only show when selecting */}
+      {isSelecting && (
+        <View style={timeTrackerStyles.stickyCancelContainer}>
+          <TouchableOpacity
+            style={timeTrackerStyles.stickyCancelButton}
+            onPress={handleCancelSelection}
+          >
+            <Text style={timeTrackerStyles.stickyCancelText}>Cancel Selection</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Custom Time Modal */}
       <Modal
@@ -339,7 +342,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
                 style={[globalStyles.button, timeTrackerStyles.modalAddButton]}
                 onPress={handleAddCustomTimeRange}
               >
-                <Text style={globalStyles.buttonText}>Add Range</Text>
+                <Text style={globalStyles.buttonText}>Add</Text>
               </TouchableOpacity>
             </View>
           </View>
