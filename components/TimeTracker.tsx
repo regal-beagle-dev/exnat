@@ -3,16 +3,22 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useState } from 'react';
 import {
   Alert,
-  Modal,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { Colors, globalStyles } from '../constants/Theme';
-import { useTimeTracker, type TimeSlot } from '../hooks/useTimeTracker';
+import { useTimeTracker, type TimeSlot as TimeSlotType } from '../hooks/useTimeTracker';
 import { timeTrackerStyles } from '../styles/TimeTrackerStyles';
+import {
+  CustomTimeModal,
+  InstructionCard,
+  SelectedRangesList,
+  TimeModeToggle,
+  TimeSlot,
+  TimeTrackerHeader,
+} from './TimeTracker/';
 
 interface TimeTrackerProps {
   isYesterday?: boolean;
@@ -122,52 +128,23 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
     });
   };
 
-  const renderTimeSlot = (slot: TimeSlot, index: number) => {
+  const renderTimeSlot = (slot: TimeSlotType, index: number) => {
     const isInRange = isTimeInRange(slot.time);
     const isCurrentlySelected = slot.isSelected;
     const isFirstIntervalOfHour = Math.abs((slot.time * 3) % 3) < 0.001; // More robust floating point comparison
     
     return (
-      <View key={slot.time}>
-        {/* Hour divider line */}
-        {isFirstIntervalOfHour && index > 0 && (
-          <View style={timeTrackerStyles.hourDivider} />
-        )}
-        
-        <TouchableOpacity
-          style={[
-            timeTrackerStyles.calendarInterval,
-            isInRange && timeTrackerStyles.calendarIntervalInRange,
-            isCurrentlySelected && timeTrackerStyles.calendarIntervalSelected,
-          ]}
-          onPress={() => handleSlotPress(slot.time)}
-          onPressIn={() => {
-            // Only update preview if we're in the middle of a selection
-            if (isSelecting) {
-              updateSelectionPreview(slot.time);
-            }
-          }}
-          activeOpacity={0.7}
-        >
-          <View style={timeTrackerStyles.timeLabel}>
-            <Text style={[
-              timeTrackerStyles.timeText,
-              (isInRange || isCurrentlySelected) && timeTrackerStyles.timeTextActive,
-            ]}>
-              {formatTime(slot.time)}
-            </Text>
-          </View>
-          <View style={[
-            timeTrackerStyles.intervalContent,
-            isInRange && timeTrackerStyles.intervalContentInRange,
-            isCurrentlySelected && timeTrackerStyles.intervalContentSelected,
-          ]}>
-            {(isInRange || isCurrentlySelected) && (
-              <Text style={timeTrackerStyles.selectedIndicator}>🌿</Text>
-            )}
-          </View>
-        </TouchableOpacity>
-      </View>
+      <TimeSlot
+        key={slot.time}
+        time={slot.time}
+        isInRange={isInRange}
+        isSelected={isCurrentlySelected}
+        isFirstIntervalOfHour={isFirstIntervalOfHour}
+        showHourDivider={index > 0}
+        formatTime={formatTime}
+        onPress={handleSlotPress}
+        onPressIn={isSelecting ? updateSelectionPreview : undefined}
+      />
     );
   };
 
@@ -177,23 +154,13 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
       style={timeTrackerStyles.container}
     >
       <ScrollView contentContainerStyle={timeTrackerStyles.scrollContent}>
-        <View style={timeTrackerStyles.header}>
-          <TouchableOpacity style={timeTrackerStyles.backButton} onPress={onClose}>
-            <Text style={timeTrackerStyles.backButtonText}>← Back</Text>
-          </TouchableOpacity>
-          <View style={timeTrackerStyles.headerContent}>
-            <Text style={timeTrackerStyles.title}>Track Your Time Outside</Text>
-            <Text style={timeTrackerStyles.date}>{getCurrentDate()}</Text>
-          </View>
-        </View>
+        <TimeTrackerHeader
+          title="Track Your Time Outside"
+          date={getCurrentDate()}
+          onBack={onClose}
+        />
 
-        <View style={[globalStyles.card, timeTrackerStyles.instructionCard]}>
-          <Text style={timeTrackerStyles.instructionTitle}>How to track your time:</Text>
-          <Text style={timeTrackerStyles.instructionText}>
-            • Tap a start time and then an end time{'\n'}
-            • Use &quot;Custom Time&quot; for precise timing
-          </Text>
-        </View>
+        <InstructionCard />
 
         <View style={[globalStyles.card, timeTrackerStyles.timeGrid]}>
           <Text style={timeTrackerStyles.gridTitle}>Select Hours (24-hour format)</Text>
@@ -203,62 +170,21 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
             </Text>
           )}
           
-          {/* AM/PM Toggle Tabs */}
-          <View style={timeTrackerStyles.timeModeToggle}>
-            <TouchableOpacity
-              style={[
-                timeTrackerStyles.timeModeTab,
-                timeMode === 'AM' && timeTrackerStyles.timeModeTabActive
-              ]}
-              onPress={() => setTimeMode('AM')}
-            >
-              <Text style={[
-                timeTrackerStyles.timeModeTabText,
-                timeMode === 'AM' && timeTrackerStyles.timeModeTabTextActive
-              ]}>
-                AM
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[
-                timeTrackerStyles.timeModeTab,
-                timeMode === 'PM' && timeTrackerStyles.timeModeTabActive
-              ]}
-              onPress={() => setTimeMode('PM')}
-            >
-              <Text style={[
-                timeTrackerStyles.timeModeTabText,
-                timeMode === 'PM' && timeTrackerStyles.timeModeTabTextActive
-              ]}>
-                PM
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <TimeModeToggle
+            timeMode={timeMode}
+            onToggle={setTimeMode}
+          />
           
           <View style={timeTrackerStyles.calendarContainer}>
             {getFilteredTimeSlots(timeMode).map((slot, index) => renderTimeSlot(slot, index))}
           </View>
         </View>
 
-        {selectedRanges.length > 0 && (
-          <View style={[globalStyles.card, timeTrackerStyles.selectedRanges]}>
-            <Text style={timeTrackerStyles.rangesTitle}>Selected Time Ranges:</Text>
-            {selectedRanges.map((range, index) => (
-              <View key={index} style={timeTrackerStyles.rangeItem}>
-                <Text style={timeTrackerStyles.rangeText}>
-                  {formatTimeRange(range.start, range.end)}
-                </Text>
-                <TouchableOpacity
-                  style={timeTrackerStyles.removeRange}
-                  onPress={() => handleRemoveRange(index)}
-                >
-                  <Text style={timeTrackerStyles.removeRangeText}>×</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-        )}
+        <SelectedRangesList
+          selectedRanges={selectedRanges}
+          formatTimeRange={formatTimeRange}
+          onRemoveRange={handleRemoveRange}
+        />
 
         <View style={timeTrackerStyles.actionButtons}>
           <TouchableOpacity
@@ -293,61 +219,15 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
         </View>
       )}
 
-      {/* Custom Time Modal */}
-      <Modal
+      <CustomTimeModal
         visible={showCustomTime}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowCustomTime(false)}
-      >
-        <View style={timeTrackerStyles.modalOverlay}>
-          <View style={[globalStyles.card, timeTrackerStyles.modalContent]}>
-            <Text style={timeTrackerStyles.modalTitle}>Add Custom Time Range</Text>
-            
-            <View style={timeTrackerStyles.customTimeInputs}>
-              <View style={timeTrackerStyles.timeInputGroup}>
-                <Text style={timeTrackerStyles.modalTimeLabel}>Start Time (HH:MM)</Text>
-                <TextInput
-                  style={[globalStyles.input, timeTrackerStyles.timeInput]}
-                  value={customStartTime}
-                  onChangeText={setCustomStartTime}
-                  placeholder="14:30"
-                  placeholderTextColor={Colors.textLight}
-                  keyboardType="default"
-                />
-              </View>
-              
-              <View style={timeTrackerStyles.timeInputGroup}>
-                <Text style={timeTrackerStyles.modalTimeLabel}>End Time (HH:MM)</Text>
-                <TextInput
-                  style={[globalStyles.input, timeTrackerStyles.timeInput]}
-                  value={customEndTime}
-                  onChangeText={setCustomEndTime}
-                  placeholder="16:45"
-                  placeholderTextColor={Colors.textLight}
-                  keyboardType="default"
-                />
-              </View>
-            </View>
-
-            <View style={timeTrackerStyles.modalButtons}>
-              <TouchableOpacity
-                style={[globalStyles.button, globalStyles.secondaryButton, timeTrackerStyles.modalCancelButton]}
-                onPress={() => setShowCustomTime(false)}
-              >
-                <Text style={globalStyles.secondaryButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={[globalStyles.button, timeTrackerStyles.modalAddButton]}
-                onPress={handleAddCustomTimeRange}
-              >
-                <Text style={globalStyles.buttonText}>Add</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        customStartTime={customStartTime}
+        customEndTime={customEndTime}
+        onCustomStartTimeChange={setCustomStartTime}
+        onCustomEndTimeChange={setCustomEndTime}
+        onClose={() => setShowCustomTime(false)}
+        onAdd={handleAddCustomTimeRange}
+      />
     </LinearGradient>
   );
 };
