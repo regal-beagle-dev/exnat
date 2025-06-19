@@ -211,7 +211,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
                 timeTrackerStyles.timeModeTabText,
                 timeMode === 'AM' && timeTrackerStyles.timeModeTabTextActive
               ]}>
-                AM (00:00 - 11:40)
+                AM
               </Text>
             </TouchableOpacity>
             
@@ -226,7 +226,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
                 timeTrackerStyles.timeModeTabText,
                 timeMode === 'PM' && timeTrackerStyles.timeModeTabTextActive
               ]}>
-                PM (12:00 - 23:40)
+                PM
               </Text>
             </TouchableOpacity>
           </View>
