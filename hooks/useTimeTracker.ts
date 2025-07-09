@@ -1,13 +1,9 @@
 import { useCallback, useState } from 'react';
+import { TimeRange } from '../components/TimeTracker/interfaces';
 
 export interface TimeSlot {
   time: number; // Time in hours (e.g., 1.33 for 01:20)
   isSelected: boolean;
-}
-
-export interface TimeRange {
-  start: number;
-  end: number;
 }
 
 export const MINUTES_PER_INTERVAL = 20;

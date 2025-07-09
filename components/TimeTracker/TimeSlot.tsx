@@ -1,17 +1,7 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { timeTrackerStyles } from '../../styles/TimeTrackerStyles';
-
-interface TimeSlotProps {
-  time: number;
-  isInRange: boolean;
-  isSelected: boolean;
-  isFirstIntervalOfHour: boolean;
-  showHourDivider: boolean;
-  formatTime: (time: number) => string;
-  onPress: (time: number) => void;
-  onPressIn?: (time: number) => void;
-}
+import { TimeSlotProps } from './props';
 
 const TimeSlot: React.FC<TimeSlotProps> = ({
   time,

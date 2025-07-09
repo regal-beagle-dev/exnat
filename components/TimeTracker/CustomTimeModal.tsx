@@ -8,16 +8,7 @@ import {
 } from 'react-native';
 import { Colors, globalStyles } from '../../constants/Theme';
 import { timeTrackerStyles } from '../../styles/TimeTrackerStyles';
-
-interface CustomTimeModalProps {
-  visible: boolean;
-  customStartTime: string;
-  customEndTime: string;
-  onCustomStartTimeChange: (time: string) => void;
-  onCustomEndTimeChange: (time: string) => void;
-  onClose: () => void;
-  onAdd: () => void;
-}
+import { CustomTimeModalProps } from './props';
 
 const CustomTimeModal: React.FC<CustomTimeModalProps> = ({
   visible,

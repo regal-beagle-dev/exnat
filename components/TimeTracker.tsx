@@ -19,11 +19,7 @@ import {
   TimeSlot,
   TimeTrackerHeader,
 } from './TimeTracker/';
-
-interface TimeTrackerProps {
-  isYesterday?: boolean;
-  onClose: () => void;
-}
+import { TimeTrackerProps } from './TimeTracker/props';
 
 const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose }) => {
   const {
@@ -52,7 +48,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
   const handleSlotPress = useCallback(async (time: number) => {
     // Debounce rapid successive touches
     const now = Date.now();
-    if (now - lastPressTime < 300) { // 300ms debounce
+    if (now - lastPressTime < 300) {
       return;
     }
     setLastPressTime(now);

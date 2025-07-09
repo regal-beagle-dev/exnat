@@ -2,17 +2,7 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { globalStyles } from '../../constants/Theme';
 import { timeTrackerStyles } from '../../styles/TimeTrackerStyles';
-
-interface TimeRange {
-  start: number;
-  end: number;
-}
-
-interface SelectedRangesListProps {
-  selectedRanges: TimeRange[];
-  formatTimeRange: (start: number, end: number) => string;
-  onRemoveRange: (index: number) => void;
-}
+import { SelectedRangesListProps } from './props';
 
 const SelectedRangesList: React.FC<SelectedRangesListProps> = ({
   selectedRanges,

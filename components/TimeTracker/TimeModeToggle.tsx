@@ -1,11 +1,7 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { timeTrackerStyles } from '../../styles/TimeTrackerStyles';
-
-interface TimeModeToggleProps {
-  timeMode: 'AM' | 'PM';
-  onToggle: (mode: 'AM' | 'PM') => void;
-}
+import { TimeModeToggleProps } from './props';
 
 const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
   timeMode,

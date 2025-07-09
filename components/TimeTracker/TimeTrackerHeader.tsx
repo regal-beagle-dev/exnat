@@ -1,12 +1,7 @@
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { timeTrackerStyles } from '../../styles/TimeTrackerStyles';
-
-interface TimeTrackerHeaderProps {
-  title: string;
-  date: string;
-  onBack: () => void;
-}
+import { TimeTrackerHeaderProps } from './props';
 
 const TimeTrackerHeader: React.FC<TimeTrackerHeaderProps> = ({
   title,
