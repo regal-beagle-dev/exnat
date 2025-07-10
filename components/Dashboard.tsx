@@ -11,6 +11,7 @@ import {
 import { Colors, globalStyles } from '../constants/Theme';
 // import { useAuth } from '../context/AuthContext';
 import { dashboardStyles } from '../styles/DashboardStyles';
+import Settings from './Settings';
 import TimeTracker from './TimeTracker';
 
 const Dashboard: React.FC = () => {
@@ -18,6 +19,7 @@ const Dashboard: React.FC = () => {
   const user = { email: 'test@test.com' }; // temporary
   const logout = async () => {}; // temporary
   const [showTimeTracker, setShowTimeTracker] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [isYesterday, setIsYesterday] = useState(false);
 
   const handleLogout = async () => {
@@ -47,6 +49,15 @@ const Dashboard: React.FC = () => {
 
   const handleCloseTimeTracker = () => {
     setShowTimeTracker(false);
+  };
+
+  const handleOpenSettings = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowSettings(true);
+  };
+
+  const handleCloseSettings = () => {
+    setShowSettings(false);
   };
 
   const getCurrentDate = () => {
@@ -79,6 +90,14 @@ const Dashboard: React.FC = () => {
     );
   }
 
+  if (showSettings) {
+    return (
+      <Settings 
+        onClose={handleCloseSettings}
+      />
+    );
+  }
+
   return (
     <LinearGradient
       colors={[Colors.gradientStart, Colors.gradientEnd]}
@@ -91,12 +110,20 @@ const Dashboard: React.FC = () => {
               <Text style={dashboardStyles.greeting}>Hello, {user?.email?.split('@')[0]}! 🌱</Text>
               <Text style={dashboardStyles.date}>{getCurrentDate()}</Text>
             </View>
-            <TouchableOpacity 
-              style={dashboardStyles.logoutButton}
-              onPress={handleLogout}
-            >
-              <Text style={dashboardStyles.logoutText}>Sign Out</Text>
-            </TouchableOpacity>
+            <View style={dashboardStyles.headerButtons}>
+              <TouchableOpacity 
+                style={dashboardStyles.settingsButton}
+                onPress={handleOpenSettings}
+              >
+                <Text style={dashboardStyles.settingsText}>⚙️</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={dashboardStyles.logoutButton}
+                onPress={handleLogout}
+              >
+                <Text style={dashboardStyles.logoutText}>Sign Out</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -113,7 +140,7 @@ const Dashboard: React.FC = () => {
               style={[globalStyles.button, dashboardStyles.primaryAction]}
               onPress={() => handleTrackTime(false)}
             >
-              <Text style={dashboardStyles.actionIcon}>📅</Text>
+              <Text style={dashboardStyles.actionIcon}>🗓️</Text>
               <Text style={[globalStyles.buttonText, dashboardStyles.actionText]}>
                 Track Today&apos;s Time
               </Text>

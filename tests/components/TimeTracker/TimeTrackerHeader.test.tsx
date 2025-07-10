@@ -1,4 +1,3 @@
-// Unit tests for TimeTrackerHeader component logic
 describe('TimeTrackerHeader Component Logic', () => {
   const mockProps = {
     title: 'Track Your Time Outside',

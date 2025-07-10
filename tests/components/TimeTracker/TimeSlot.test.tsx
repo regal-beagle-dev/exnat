@@ -1,4 +1,3 @@
-// Unit tests for TimeSlot component logic
 describe('TimeSlot Component Logic', () => {
   const mockProps = {
     time: 9.5, // 9:30 AM
@@ -72,7 +71,6 @@ describe('TimeSlot Component Logic', () => {
   });
 
   it('should validate time values are within reasonable bounds', () => {
-    // Test various time values that should be valid
     const validTimes = [0, 6, 12, 18, 23.5];
     validTimes.forEach(time => {
       expect(time).toBeGreaterThanOrEqual(0);

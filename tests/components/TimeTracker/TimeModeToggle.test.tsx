@@ -1,4 +1,3 @@
-// Unit tests for TimeModeToggle component logic
 describe('TimeModeToggle Component Logic', () => {
   const mockProps = {
     timeMode: 'AM' as const,

@@ -1,4 +1,3 @@
-// Unit tests for InstructionCard component logic
 describe('InstructionCard Component Logic', () => {
   it('should validate instruction content', () => {
     const expectedTitle = 'How to track your time:';
@@ -27,7 +26,6 @@ describe('InstructionCard Component Logic', () => {
     const title = 'How to track your time:';
     const instructions = '• Tap a start time and then an end time\n• Use "Custom Time" for precise timing';
     
-    // Both should mention time tracking
     expect(title.toLowerCase()).toContain('time');
     expect(instructions.toLowerCase()).toContain('time');
   });

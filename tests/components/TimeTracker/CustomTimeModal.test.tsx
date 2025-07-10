@@ -1,4 +1,3 @@
-// Unit tests for CustomTimeModal component logic
 describe('CustomTimeModal Component Logic', () => {
   const mockProps = {
     visible: true,

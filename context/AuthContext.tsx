@@ -50,19 +50,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // Simulate API call - you'll replace this with your Django backend
-      // For now, we'll just validate email format and password length
+      // FIXME: Mock
       if (!email.includes('@') || password.length < 6) {
         return false;
       }
 
-      // Mock user data
+      // FIXME: Mock
       const userData: User = {
         id: Math.random().toString(36).substr(2, 9),
         email,
       };
 
-      // Store token and user data
+      // FIXME: Mock
       await SecureStore.setItemAsync('userToken', 'mock-jwt-token');
       await AsyncStorage.setItem('userData', JSON.stringify(userData));
       
@@ -76,12 +75,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (email: string, password: string): Promise<boolean> => {
     try {
-      // Simulate API call - you'll replace this with your Django backend
+      // FIXME: Mock
       if (!email.includes('@') || password.length < 6) {
         return false;
       }
 
-      // For now, just use the same logic as login
+      // FIXME: Mock
       return await login(email, password);
     } catch (error) {
       console.log('Registration error:', error);

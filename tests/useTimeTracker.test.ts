@@ -1,10 +1,7 @@
-// Test file for useTimeTracker hook
 import { INTERVALS_PER_HOUR, MINUTES_PER_INTERVAL } from '../hooks/useTimeTracker';
 
-// Test the core logic functions directly without React hooks
 describe('useTimeTracker Logic', () => {
   describe('Time Selection Math', () => {
-    // Test the calculateIntervalBounds logic directly
     const calculateIntervalBounds = (startTime: number, endTime: number) => {
       const startInterval = Math.floor(Math.min(startTime, endTime) * INTERVALS_PER_HOUR);
       const endInterval = Math.floor(Math.max(startTime, endTime) * INTERVALS_PER_HOUR);
@@ -94,14 +91,12 @@ describe('useTimeTracker Logic', () => {
       
       const { finalStart, finalEnd } = calculateIntervalBounds(time08_20, time09_20);
       
-      // The user reports this sometimes becomes 08:00 to 09:20, but should be 08:20 to 09:40
       const expectedStart = 8 + 20/60;  // Should stay at 08:20, NOT 08:00
       const expectedEnd = 9 + 40/60;    // Should be 09:40
       
       expect(finalStart).toBeCloseTo(expectedStart, 10);
       expect(finalEnd).toBeCloseTo(expectedEnd, 10);
       
-      // Explicitly check it's NOT the problematic result
       expect(finalStart).not.toBe(8.0); // Should NOT be 08:00
     });
 
@@ -131,12 +126,10 @@ describe('useTimeTracker Logic', () => {
       expect(finalStart).toBeCloseTo(expectedStart, 10);
       expect(finalEnd).toBeCloseTo(expectedEnd, 10);
       
-      // Explicitly check it's NOT the problematic result
-      expect(finalStart).not.toBe(10.0); // Should NOT be 10:00
-      expect(finalStart).toBeCloseTo(10.333333, 5); // Should be 10:20
+      expect(finalStart).not.toBe(10.0);
+      expect(finalStart).toBeCloseTo(10.333333, 5);
     });
 
-    // Helper function for debugging
     const formatTimeHelper = (time: number): string => {
       const hours = Math.floor(time);
       const minutes = Math.round((time - hours) * 60);
@@ -164,7 +157,7 @@ describe('useTimeTracker Logic', () => {
   describe('Interval Calculations', () => {
     test('20-minute intervals should be calculated correctly', () => {
       expect(MINUTES_PER_INTERVAL).toBe(20);
-      expect(INTERVALS_PER_HOUR).toBe(3); // 60 / 20 = 3
+      expect(INTERVALS_PER_HOUR).toBe(3);
     });
 
     test('Time to interval conversion should work', () => {
@@ -178,10 +171,8 @@ describe('useTimeTracker Logic', () => {
       expect(Math.floor((8 + 40/60) * INTERVALS_PER_HOUR)).toBe(26);
     });
   test('Time slot precision should map correctly to intervals', () => {
-      // Test the exact time slot generation to ensure precision fix works
       const TOTAL_INTERVALS = 24 * INTERVALS_PER_HOUR;
       const timeSlots = Array.from({ length: TOTAL_INTERVALS }, (_, i) => {
-        // Calculate hours and minutes precisely (same as fixed hook)
         const totalMinutes = i * MINUTES_PER_INTERVAL;
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
@@ -192,7 +183,6 @@ describe('useTimeTracker Logic', () => {
         };
       });
       
-      // Find the 10:20 slot
       const slot10_20 = timeSlots.find(slot => 
         Math.abs(slot.time - (10 + 20/60)) < 0.00001
       );
@@ -204,9 +194,8 @@ describe('useTimeTracker Logic', () => {
         console.log(`10:20 slot time: ${slot10_20.time}`);
         console.log(`10:20 slot interval: ${interval}`);
         
-        // This should be interval 31, NOT 30
-        expect(interval).toBe(31); // 10:20 should map to interval 31
-        expect(interval).not.toBe(30); // Should NOT map to interval 30 (10:00's interval)
+        expect(interval).toBe(31);
+        expect(interval).not.toBe(30);
       }
     });
   });

@@ -19,7 +19,7 @@ export const useTimeTracker = () => {
       const minutes = totalMinutes % 60;
       
       return {
-        time: hours + minutes / 60, // This ensures clean fractional representation
+        time: hours + minutes / 60,
         isSelected: false,
       };
     })
@@ -28,7 +28,6 @@ export const useTimeTracker = () => {
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionStart, setSelectionStart] = useState<number | null>(null);
 
-  // Time formatting utilities
   const formatTime = useCallback((time: number): string => {
     const hours = Math.floor(time);
     const minutes = Math.round((time - hours) * 60);
@@ -58,7 +57,6 @@ export const useTimeTracker = () => {
     return `${formatTime(start)} - ${formatTime(end)}`;
   }, []);
 
-  // Time calculation utilities
   const calculateIntervalBounds = useCallback((startTime: number, endTime: number) => {
     const startInterval = Math.floor(Math.min(startTime, endTime) * INTERVALS_PER_HOUR);
     const endInterval = Math.floor(Math.max(startTime, endTime) * INTERVALS_PER_HOUR);
@@ -77,12 +75,10 @@ export const useTimeTracker = () => {
     return { hours, minutes, totalHours };
   }, [selectedRanges]);
 
-  // Selection management
   const updateSelectionPreview = useCallback((time: number) => {
     if (isSelecting && selectionStart !== null) {
       const { finalStart, finalEnd } = calculateIntervalBounds(selectionStart, time);
       
-      // Debug logging for preview updates (development only)
       if (__DEV__) {
         console.log('Preview Update:', {
           from: formatTime(selectionStart),
@@ -110,10 +106,9 @@ export const useTimeTracker = () => {
     );
   }, []);
 
-  // Helper function to check for overlapping ranges
   const isRangeOverlapping = useCallback((newStart: number, newEnd: number): boolean => {
     return selectedRanges.some(range => 
-      (newStart < range.end && newEnd > range.start) // Check for any overlap
+      (newStart < range.end && newEnd > range.start)
     );
   }, [selectedRanges]);
 
@@ -121,7 +116,6 @@ export const useTimeTracker = () => {
     if (selectionStart !== null) {
       const { finalStart, finalEnd } = calculateIntervalBounds(selectionStart, time);
 
-      // Debug logging to help identify issues (development only)
       if (__DEV__) {
         console.log('Time Selection Debug:', {
           selectionStart: selectionStart,
@@ -135,7 +129,6 @@ export const useTimeTracker = () => {
         });
       }
 
-      // Check for overlapping ranges
       if (isRangeOverlapping(finalStart, finalEnd)) {
         if (__DEV__) {
           console.warn('Range overlaps with existing selection, skipping');
@@ -146,7 +139,6 @@ export const useTimeTracker = () => {
         return;
       }
 
-      // Immediately update the selected ranges without timeout to prevent race conditions
       setSelectedRanges(prev => [...prev, { start: finalStart, end: finalEnd }]);
       setIsSelecting(false);
       setSelectionStart(null);
@@ -160,7 +152,6 @@ export const useTimeTracker = () => {
     setTimeSlots(prev => prev.map(slot => ({ ...slot, isSelected: false })));
   }, []);
 
-  // Range management
   const isTimeInRange = useCallback((time: number): boolean => {
     return selectedRanges.some(range => time >= range.start && time < range.end);
   }, [selectedRanges]);
@@ -191,7 +182,6 @@ export const useTimeTracker = () => {
     setSelectedRanges([]);
   }, []);
 
-  // Filtering utilities
   const getFilteredTimeSlots = useCallback((timeMode: 'AM' | 'PM') => {
     return timeSlots.filter(slot => {
       const hour = Math.floor(slot.time);

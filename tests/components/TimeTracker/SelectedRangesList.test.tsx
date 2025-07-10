@@ -1,4 +1,3 @@
-// Unit tests for SelectedRangesList component logic
 describe('SelectedRangesList Component Logic', () => {
   const mockProps = {
     selectedRanges: [
