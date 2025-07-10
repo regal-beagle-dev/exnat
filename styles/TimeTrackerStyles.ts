@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { BorderRadius, Colors, Spacing } from '../constants/Theme';
 
-const INTERVAL_HEIGHT = 38; // Height of each 20-minute interval slot - reduced for less scrolling
+const INTERVAL_HEIGHT = 38;
 
 export const timeTrackerStyles = StyleSheet.create({
   container: {
@@ -133,10 +133,10 @@ export const timeTrackerStyles = StyleSheet.create({
     flex: 1,
   },
   hourDivider: {
-    height: 1, // Reduced height for less visual clutter
+    height: 1,
     backgroundColor: Colors.primary,
-    opacity: 0.4, // Reduced opacity
-    marginVertical: 2, // Reduced margin
+    opacity: 0.4,
+    marginVertical: 2,
     borderRadius: 1,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 1 },
@@ -147,7 +147,7 @@ export const timeTrackerStyles = StyleSheet.create({
   calendarInterval: {
     flexDirection: 'row',
     height: INTERVAL_HEIGHT,
-    marginBottom: 2, // Reduced padding between intervals for less scrolling
+    marginBottom: 2,
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.sm,
     overflow: 'hidden',
@@ -171,7 +171,7 @@ export const timeTrackerStyles = StyleSheet.create({
     shadowRadius: 3,
   },
   timeLabel: {
-    width: 70, // Reduced width to save space
+    width: 70,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.surfaceSecondary,
@@ -179,19 +179,19 @@ export const timeTrackerStyles = StyleSheet.create({
     borderRightColor: Colors.timeSlot,
   },
   timeText: {
-    fontSize: 12, // Reduced font size for more compact display
+    fontSize: 12,
     fontWeight: '600',
     color: Colors.textSecondary,
   },
   timeTextActive: {
-    color: Colors.primary, // Changed to ensure visibility
+    color: Colors.primary,
     fontWeight: 'bold',
   },
   intervalContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: Spacing.sm, // Reduced padding
+    paddingHorizontal: Spacing.sm,
     position: 'relative',
   },
   intervalContentSelected: {
@@ -201,7 +201,7 @@ export const timeTrackerStyles = StyleSheet.create({
     backgroundColor: 'rgba(74, 124, 89, 0.2)',
   },
   selectedIndicator: {
-    fontSize: 16, // Reduced emoji size
+    fontSize: 16,
     zIndex: 1,
   },
   selectedRanges: {
@@ -247,12 +247,12 @@ export const timeTrackerStyles = StyleSheet.create({
   },
   customTimeButton: {
     marginBottom: Spacing.md,
-    backgroundColor: Colors.mustard, // Soft mustardy yellow to match Dashboard
+    backgroundColor: Colors.mustard
   },
   customTimeText: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.surface, // White text for contrast
+    color: Colors.surface
   },
   submitButton: {
     paddingVertical: Spacing.lg,
@@ -308,7 +308,6 @@ export const timeTrackerStyles = StyleSheet.create({
     flex: 1,
     marginLeft: Spacing.sm,
   },
-  // Sticky cancel button for better accessibility
   stickyCancelContainer: {
     position: 'absolute',
     bottom: 0,
@@ -319,7 +318,7 @@ export const timeTrackerStyles = StyleSheet.create({
     borderTopColor: 'rgba(0, 0, 0, 0.1)',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
-    paddingBottom: 30, // Extra padding for safe area
+    paddingBottom: 30,
   },
   stickyCancelButton: {
     backgroundColor: Colors.error,

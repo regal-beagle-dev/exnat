@@ -28,6 +28,20 @@ export const dashboardStyles = StyleSheet.create({
     fontSize: 16,
     color: Colors.textSecondary,
   },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  settingsButton: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  settingsText: {
+    fontSize: 18,
+  },
   logoutButton: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
