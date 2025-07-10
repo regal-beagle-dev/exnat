@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { globalStyles } from '../constants/Theme';
 import ActivityManager from './Settings/ActivityManager';
+import BuddyManagement from './Settings/BuddyManagement';
+import BuddyManager from './Settings/BuddyManager';
 import DefaultTimeRanges from './Settings/DefaultTimeRanges';
-import { Activity, SettingsData } from './Settings/interfaces';
+import { Activity, Buddy, SettingsData } from './Settings/interfaces';
 import { SettingsProps } from './Settings/props';
 import SettingsHeader from './Settings/SettingsHeader';
 import SettingsSection from './Settings/SettingsSection';
 import TimeFormatToggle from './Settings/TimeFormatToggle';
 
 const Settings: React.FC<SettingsProps> = ({ onClose }) => {
+  const [showBuddyManager, setShowBuddyManager] = useState(false);
   const [settingsData, setSettingsData] = useState<SettingsData>({
     useMilitaryTime: false,
     defaultTimeRanges: {
@@ -28,6 +31,18 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
         type: 'Work',
         name: 'Deep Focus',
         emoji: '💻',
+      },
+    ],
+    buddies: [
+      {
+        id: '1',
+        name: 'Sarah',
+        relationship: 'Sister',
+      },
+      {
+        id: '2',
+        name: 'Dad',
+        relationship: 'Father',
       },
     ],
   });
@@ -78,6 +93,44 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
     }));
   };
 
+  const handleNavigateToBuddyManager = () => {
+    setShowBuddyManager(true);
+  };
+
+  const handleCloseBuddyManager = () => {
+    setShowBuddyManager(false);
+  };
+
+  const handleAddBuddy = (buddy: Omit<Buddy, 'id'>) => {
+    const newBuddy: Buddy = {
+      ...buddy,
+      id: Date.now().toString(),
+    };
+    
+    setSettingsData(prev => ({
+      ...prev,
+      buddies: [...prev.buddies, newBuddy],
+    }));
+  };
+
+  const handleRemoveBuddy = (id: string) => {
+    setSettingsData(prev => ({
+      ...prev,
+      buddies: prev.buddies.filter(buddy => buddy.id !== id),
+    }));
+  };
+
+  if (showBuddyManager) {
+    return (
+      <BuddyManager
+        onClose={handleCloseBuddyManager}
+        buddies={settingsData.buddies}
+        onAddBuddy={handleAddBuddy}
+        onRemoveBuddy={handleRemoveBuddy}
+      />
+    );
+  }
+
   return (
     <View style={globalStyles.container}>
       <SettingsHeader onClose={onClose} />
@@ -108,6 +161,13 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
             activities={settingsData.activities}
             onAddActivity={handleAddActivity}
             onRemoveActivity={handleRemoveActivity}
+          />
+        </SettingsSection>
+
+        <SettingsSection title="Buddy Management">
+          <BuddyManagement
+            buddies={settingsData.buddies}
+            onNavigateToBuddyManager={handleNavigateToBuddyManager}
           />
         </SettingsSection>
       </ScrollView>
