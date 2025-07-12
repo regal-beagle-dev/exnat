@@ -3,12 +3,18 @@ import {
   Alert,
   FlatList,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { globalStyles } from '../../constants/Theme';
 import { activityManagerStyles } from '../../styles/ActivityManagerStyles';
+import { Form } from '../core/forms';
+import {
+  NewActivityFormData,
+  newActivityFormFields,
+  NewCategoryFormData,
+  newCategoryFormFields
+} from './forms/ActivityForms';
 import { Activity, ActivityCategory } from './interfaces';
 import { ActivityDetailManagerProps } from './props';
 import SettingsHeader from './SettingsHeader';
@@ -26,55 +32,32 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
   const [activeTab, setActiveTab] = useState<'activities' | 'categories'>('activities');
   const [showAddActivityForm, setShowAddActivityForm] = useState(false);
   const [showAddCategoryForm, setShowAddCategoryForm] = useState(false);
-  
-  const [newActivity, setNewActivity] = useState({
-    name: '',
-    emoji: '',
-    categoryName: '',
-  });
-  
-  const [newCategory, setNewCategory] = useState({
-    name: '',
-    emoji: '',
-  });
 
-  const handleAddActivity = () => {
-    if (!newActivity.name.trim() || !newActivity.emoji.trim()) {
-      Alert.alert('Error', 'Please fill in all required fields');
-      return;
-    }
-
+  const handleAddActivity = (data: NewActivityFormData) => {
     let selectedCategory: ActivityCategory | undefined;
-    if (newActivity.categoryName.trim()) {
-      selectedCategory = categories.find(cat => cat.name === newActivity.categoryName.trim());
+    if (data.categoryName.trim()) {
+      selectedCategory = categories.find(cat => cat.name === data.categoryName.trim());
       if (!selectedCategory) {
-        Alert.alert('Error', `Category "${newActivity.categoryName}" not found`);
+        Alert.alert('Error', `Category "${data.categoryName}" not found`);
         return;
       }
     }
 
     onAddActivity({
-      name: newActivity.name.trim(),
-      emoji: newActivity.emoji.trim(),
+      name: data.name.trim(),
+      emoji: data.emoji.trim(),
       category: selectedCategory,
     });
 
-    setNewActivity({ name: '', emoji: '', categoryName: '' });
     setShowAddActivityForm(false);
   };
 
-  const handleAddCategory = () => {
-    if (!newCategory.name.trim() || !newCategory.emoji.trim()) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
+  const handleAddCategory = (data: NewCategoryFormData) => {
     onAddCategory({
-      name: newCategory.name.trim(),
-      emoji: newCategory.emoji.trim(),
+      name: data.name.trim(),
+      emoji: data.emoji.trim(),
     });
 
-    setNewCategory({ name: '', emoji: '' });
     setShowAddCategoryForm(false);
   };
 
@@ -214,45 +197,15 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
     <View style={activityManagerStyles.content}>
       {activeTab === 'activities' ? (
         showAddActivityForm ? (
-          <View style={activityManagerStyles.addForm}>
-            <Text style={activityManagerStyles.formTitle}>Add New Activity</Text>
-            <TextInput
-              style={[globalStyles.input, activityManagerStyles.input]}
-              placeholder="Category (optional, e.g., Exercise, Work, Hobby)"
-              value={newActivity.categoryName}
-              onChangeText={(text) => setNewActivity(prev => ({ ...prev, categoryName: text }))}
-            />
-            <TextInput
-              style={[globalStyles.input, activityManagerStyles.input]}
-              placeholder="Activity name (e.g., Morning Jog)"
-              value={newActivity.name}
-              onChangeText={(text) => setNewActivity(prev => ({ ...prev, name: text }))}
-            />
-            <TextInput
-              style={[globalStyles.input, activityManagerStyles.input]}
-              placeholder="Emoji (e.g., 🏃‍♂️)"
-              value={newActivity.emoji}
-              onChangeText={(text) => setNewActivity(prev => ({ ...prev, emoji: text }))}
-              maxLength={2}
-            />
-            <View style={activityManagerStyles.formButtons}>
-              <TouchableOpacity
-                style={[globalStyles.secondaryButton, activityManagerStyles.cancelButton]}
-                onPress={() => {
-                  setShowAddActivityForm(false);
-                  setNewActivity({ name: '', emoji: '', categoryName: '' });
-                }}
-              >
-                <Text style={globalStyles.secondaryButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[globalStyles.button, activityManagerStyles.addButton]}
-                onPress={handleAddActivity}
-              >
-                <Text style={globalStyles.buttonText}>Add Activity</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <Form<NewActivityFormData>
+            fields={newActivityFormFields}
+            onSubmit={handleAddActivity}
+            submitButtonText="Add Activity"
+            showCancelButton={true}
+            cancelButtonText="Cancel"
+            onCancel={() => setShowAddActivityForm(false)}
+            style={activityManagerStyles.addForm}
+          />
         ) : (
           <TouchableOpacity
             style={[globalStyles.button, activityManagerStyles.showFormButton]}
@@ -263,39 +216,15 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
         )
       ) : (
         showAddCategoryForm ? (
-          <View style={activityManagerStyles.addForm}>
-            <Text style={activityManagerStyles.formTitle}>Add New Category</Text>
-            <TextInput
-              style={[globalStyles.input, activityManagerStyles.input]}
-              placeholder="Category name (e.g., Fitness, Work, Hobbies)"
-              value={newCategory.name}
-              onChangeText={(text) => setNewCategory(prev => ({ ...prev, name: text }))}
-            />
-            <TextInput
-              style={[globalStyles.input, activityManagerStyles.input]}
-              placeholder="Emoji (e.g., 💪)"
-              value={newCategory.emoji}
-              onChangeText={(text) => setNewCategory(prev => ({ ...prev, emoji: text }))}
-              maxLength={2}
-            />
-            <View style={activityManagerStyles.formButtons}>
-              <TouchableOpacity
-                style={[globalStyles.secondaryButton, activityManagerStyles.cancelButton]}
-                onPress={() => {
-                  setShowAddCategoryForm(false);
-                  setNewCategory({ name: '', emoji: '' });
-                }}
-              >
-                <Text style={globalStyles.secondaryButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[globalStyles.button, activityManagerStyles.addButton]}
-                onPress={handleAddCategory}
-              >
-                <Text style={globalStyles.buttonText}>Add Category</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <Form<NewCategoryFormData>
+            fields={newCategoryFormFields}
+            onSubmit={handleAddCategory}
+            submitButtonText="Add Category"
+            showCancelButton={true}
+            cancelButtonText="Cancel"
+            onCancel={() => setShowAddCategoryForm(false)}
+            style={activityManagerStyles.addForm}
+          />
         ) : (
           <TouchableOpacity
             style={[globalStyles.button, activityManagerStyles.showFormButton]}
