@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Alert,
   FlatList,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -79,80 +78,78 @@ const BuddyManager: React.FC<BuddyManagerProps> = ({
     <View style={globalStyles.container}>
       <SettingsHeader onClose={onClose} title="Buddy Management" />
       
-      <ScrollView 
-        style={globalStyles.container}
+      <FlatList
+        data={buddies}
+        renderItem={renderBuddy}
+        keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={buddyManagerStyles.scrollContent}
-      >
-        <View style={buddyManagerStyles.content}>
-          <Text style={buddyManagerStyles.pageTitle}>Buddy Management</Text>
-          <Text style={buddyManagerStyles.pageDescription}>
-            Add family members and/or friends track activities!
-          </Text>
+        ListHeaderComponent={() => (
+          <View style={buddyManagerStyles.content}>
+            <Text style={buddyManagerStyles.pageTitle}>Buddy Management</Text>
+            <Text style={buddyManagerStyles.pageDescription}>
+              Add family members and/or friends track activities!
+            </Text>
 
-          <View style={buddyManagerStyles.buddiesSection}>
-            <Text style={buddyManagerStyles.sectionTitle}>Your Buddies</Text>
-            
-            {buddies.length === 0 ? (
-              <View style={buddyManagerStyles.emptyState}>
-                <Text style={buddyManagerStyles.emptyStateText}>
-                  No buddies added yet. Add your first buddy to get started!
-                </Text>
+            <View style={buddyManagerStyles.buddiesSection}>
+              <Text style={buddyManagerStyles.sectionTitle}>Your Buddies</Text>
+            </View>
+          </View>
+        )}
+        ListEmptyComponent={() => (
+          <View style={buddyManagerStyles.emptyState}>
+            <Text style={buddyManagerStyles.emptyStateText}>
+              No buddies added yet. Add your first buddy to get started!
+            </Text>
+          </View>
+        )}
+        ListFooterComponent={() => (
+          <View style={buddyManagerStyles.content}>
+
+            {showAddForm ? (
+              <View style={buddyManagerStyles.addForm}>
+                <Text style={buddyManagerStyles.formTitle}>Add New Buddy</Text>
+                <TextInput
+                  style={[globalStyles.input, buddyManagerStyles.input]}
+                  placeholder="Buddy's name (e.g., Sarah, Dad, Alex)"
+                  value={newBuddy.name}
+                  onChangeText={(text) => setNewBuddy(prev => ({ ...prev, name: text }))}
+                />
+                <TextInput
+                  style={[globalStyles.input, buddyManagerStyles.input]}
+                  placeholder="Relationship (e.g., Sister, Friend, Spouse)"
+                  value={newBuddy.relationship}
+                  onChangeText={(text) => setNewBuddy(prev => ({ ...prev, relationship: text }))}
+                />
+                <View style={buddyManagerStyles.formButtons}>
+                  <TouchableOpacity
+                    style={[globalStyles.secondaryButton, buddyManagerStyles.cancelButton]}
+                    onPress={() => {
+                      setShowAddForm(false);
+                      setNewBuddy({ name: '', relationship: '' });
+                    }}
+                  >
+                    <Text style={globalStyles.secondaryButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[globalStyles.button, buddyManagerStyles.addButton]}
+                    onPress={handleAddBuddy}
+                  >
+                    <Text style={globalStyles.buttonText}>Add Buddy</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             ) : (
-              <FlatList
-                data={buddies}
-                renderItem={renderBuddy}
-                keyExtractor={(item) => item.id}
-                showsVerticalScrollIndicator={false}
-                scrollEnabled={false}
-              />
+              <TouchableOpacity
+                style={[globalStyles.button, buddyManagerStyles.showFormButton]}
+                onPress={() => setShowAddForm(true)}
+              >
+                <Text style={globalStyles.buttonText}>+ Add New Buddy</Text>
+              </TouchableOpacity>
             )}
           </View>
-
-          {showAddForm ? (
-            <View style={buddyManagerStyles.addForm}>
-              <Text style={buddyManagerStyles.formTitle}>Add New Buddy</Text>
-              <TextInput
-                style={[globalStyles.input, buddyManagerStyles.input]}
-                placeholder="Buddy's name (e.g., Sarah, Dad, Alex)"
-                value={newBuddy.name}
-                onChangeText={(text) => setNewBuddy(prev => ({ ...prev, name: text }))}
-              />
-              <TextInput
-                style={[globalStyles.input, buddyManagerStyles.input]}
-                placeholder="Relationship (e.g., Sister, Friend, Spouse)"
-                value={newBuddy.relationship}
-                onChangeText={(text) => setNewBuddy(prev => ({ ...prev, relationship: text }))}
-              />
-              <View style={buddyManagerStyles.formButtons}>
-                <TouchableOpacity
-                  style={[globalStyles.secondaryButton, buddyManagerStyles.cancelButton]}
-                  onPress={() => {
-                    setShowAddForm(false);
-                    setNewBuddy({ name: '', relationship: '' });
-                  }}
-                >
-                  <Text style={globalStyles.secondaryButtonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[globalStyles.button, buddyManagerStyles.addButton]}
-                  onPress={handleAddBuddy}
-                >
-                  <Text style={globalStyles.buttonText}>Add Buddy</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ) : (
-            <TouchableOpacity
-              style={[globalStyles.button, buddyManagerStyles.showFormButton]}
-              onPress={() => setShowAddForm(true)}
-            >
-              <Text style={globalStyles.buttonText}>+ Add New Buddy</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </ScrollView>
+        )}
+      />
     </View>
   );
 };

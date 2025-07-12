@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Alert,
   FlatList,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -166,188 +165,179 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
     </View>
   );
 
+  const renderListHeader = () => (
+    <View style={activityManagerStyles.content}>
+      <Text style={activityManagerStyles.pageTitle}>Activity & Category Management</Text>
+      <Text style={activityManagerStyles.pageDescription}>
+        Create and organize your activities with custom categories. Hide activities to remove them from selections without deleting.
+      </Text>
+
+      {/* Tab Navigation */}
+      <View style={activityManagerStyles.tabContainer}>
+        <TouchableOpacity
+          style={[
+            activityManagerStyles.tab,
+            activeTab === 'activities' && activityManagerStyles.activeTab
+          ]}
+          onPress={() => setActiveTab('activities')}
+        >
+          <Text style={[
+            activityManagerStyles.tabText,
+            activeTab === 'activities' && activityManagerStyles.activeTabText
+          ]}>
+            Activities
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            activityManagerStyles.tab,
+            activeTab === 'categories' && activityManagerStyles.activeTab
+          ]}
+          onPress={() => setActiveTab('categories')}
+        >
+          <Text style={[
+            activityManagerStyles.tabText,
+            activeTab === 'categories' && activityManagerStyles.activeTabText
+          ]}>
+            Categories
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={activityManagerStyles.sectionTitle}>
+        {activeTab === 'activities' ? 'Your Activities' : 'Activity Categories'}
+      </Text>
+    </View>
+  );
+
+  const renderListFooter = () => (
+    <View style={activityManagerStyles.content}>
+      {activeTab === 'activities' ? (
+        showAddActivityForm ? (
+          <View style={activityManagerStyles.addForm}>
+            <Text style={activityManagerStyles.formTitle}>Add New Activity</Text>
+            <TextInput
+              style={[globalStyles.input, activityManagerStyles.input]}
+              placeholder="Category (optional, e.g., Exercise, Work, Hobby)"
+              value={newActivity.categoryName}
+              onChangeText={(text) => setNewActivity(prev => ({ ...prev, categoryName: text }))}
+            />
+            <TextInput
+              style={[globalStyles.input, activityManagerStyles.input]}
+              placeholder="Activity name (e.g., Morning Jog)"
+              value={newActivity.name}
+              onChangeText={(text) => setNewActivity(prev => ({ ...prev, name: text }))}
+            />
+            <TextInput
+              style={[globalStyles.input, activityManagerStyles.input]}
+              placeholder="Emoji (e.g., 🏃‍♂️)"
+              value={newActivity.emoji}
+              onChangeText={(text) => setNewActivity(prev => ({ ...prev, emoji: text }))}
+              maxLength={2}
+            />
+            <View style={activityManagerStyles.formButtons}>
+              <TouchableOpacity
+                style={[globalStyles.secondaryButton, activityManagerStyles.cancelButton]}
+                onPress={() => {
+                  setShowAddActivityForm(false);
+                  setNewActivity({ name: '', emoji: '', categoryName: '' });
+                }}
+              >
+                <Text style={globalStyles.secondaryButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[globalStyles.button, activityManagerStyles.addButton]}
+                onPress={handleAddActivity}
+              >
+                <Text style={globalStyles.buttonText}>Add Activity</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={[globalStyles.button, activityManagerStyles.showFormButton]}
+            onPress={() => setShowAddActivityForm(true)}
+          >
+            <Text style={globalStyles.buttonText}>+ Add New Activity</Text>
+          </TouchableOpacity>
+        )
+      ) : (
+        showAddCategoryForm ? (
+          <View style={activityManagerStyles.addForm}>
+            <Text style={activityManagerStyles.formTitle}>Add New Category</Text>
+            <TextInput
+              style={[globalStyles.input, activityManagerStyles.input]}
+              placeholder="Category name (e.g., Fitness, Work, Hobbies)"
+              value={newCategory.name}
+              onChangeText={(text) => setNewCategory(prev => ({ ...prev, name: text }))}
+            />
+            <TextInput
+              style={[globalStyles.input, activityManagerStyles.input]}
+              placeholder="Emoji (e.g., 💪)"
+              value={newCategory.emoji}
+              onChangeText={(text) => setNewCategory(prev => ({ ...prev, emoji: text }))}
+              maxLength={2}
+            />
+            <View style={activityManagerStyles.formButtons}>
+              <TouchableOpacity
+                style={[globalStyles.secondaryButton, activityManagerStyles.cancelButton]}
+                onPress={() => {
+                  setShowAddCategoryForm(false);
+                  setNewCategory({ name: '', emoji: '' });
+                }}
+              >
+                <Text style={globalStyles.secondaryButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[globalStyles.button, activityManagerStyles.addButton]}
+                onPress={handleAddCategory}
+              >
+                <Text style={globalStyles.buttonText}>Add Category</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={[globalStyles.button, activityManagerStyles.showFormButton]}
+            onPress={() => setShowAddCategoryForm(true)}
+          >
+            <Text style={globalStyles.buttonText}>+ Add New Category</Text>
+          </TouchableOpacity>
+        )
+      )}
+    </View>
+  );
+
+  const renderEmptyComponent = () => (
+    <View style={activityManagerStyles.emptyState}>
+      <Text style={activityManagerStyles.emptyStateText}>
+        {activeTab === 'activities' 
+          ? 'No activities added yet. Create your first activity!'
+          : 'No categories created yet. Create your first category to organize activities!'
+        }
+      </Text>
+    </View>
+  );
+
+  const currentData = activeTab === 'activities' ? activities : categories;
+  const renderItem = activeTab === 'activities' ? renderActivity : renderCategory;
+
   return (
     <View style={globalStyles.container}>
       <SettingsHeader onClose={onClose} title="Manage Activities" />
       
-      <ScrollView 
-        style={globalStyles.container}
+      <FlatList
+        data={currentData}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={renderListHeader}
+        ListFooterComponent={renderListFooter}
+        ListEmptyComponent={renderEmptyComponent}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={activityManagerStyles.scrollContent}
-      >
-        <View style={activityManagerStyles.content}>
-          <Text style={activityManagerStyles.pageTitle}>Activity & Category Management</Text>
-          <Text style={activityManagerStyles.pageDescription}>
-            Create and organize your activities with custom categories. Hide activities to remove them from selections without deleting.
-          </Text>
-
-          {/* Tab Navigation */}
-          <View style={activityManagerStyles.tabContainer}>
-            <TouchableOpacity
-              style={[
-                activityManagerStyles.tab,
-                activeTab === 'activities' && activityManagerStyles.activeTab
-              ]}
-              onPress={() => setActiveTab('activities')}
-            >
-              <Text style={[
-                activityManagerStyles.tabText,
-                activeTab === 'activities' && activityManagerStyles.activeTabText
-              ]}>
-                Activities
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                activityManagerStyles.tab,
-                activeTab === 'categories' && activityManagerStyles.activeTab
-              ]}
-              onPress={() => setActiveTab('categories')}
-            >
-              <Text style={[
-                activityManagerStyles.tabText,
-                activeTab === 'categories' && activityManagerStyles.activeTabText
-              ]}>
-                Categories
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {activeTab === 'activities' ? (
-            <View style={activityManagerStyles.section}>
-              <Text style={activityManagerStyles.sectionTitle}>Your Activities</Text>
-              
-              {activities.length === 0 ? (
-                <View style={activityManagerStyles.emptyState}>
-                  <Text style={activityManagerStyles.emptyStateText}>
-                    No activities added yet. Create your first activity!
-                  </Text>
-                </View>
-              ) : (
-                <FlatList
-                  data={activities}
-                  renderItem={renderActivity}
-                  keyExtractor={(item) => item.id}
-                  showsVerticalScrollIndicator={false}
-                  scrollEnabled={false}
-                />
-              )}
-
-              {showAddActivityForm ? (
-                <View style={activityManagerStyles.addForm}>
-                  <Text style={activityManagerStyles.formTitle}>Add New Activity</Text>
-                  <TextInput
-                    style={[globalStyles.input, activityManagerStyles.input]}
-                    placeholder="Category (optional, e.g., Exercise, Work, Hobby)"
-                    value={newActivity.categoryName}
-                    onChangeText={(text) => setNewActivity(prev => ({ ...prev, categoryName: text }))}
-                  />
-                  <TextInput
-                    style={[globalStyles.input, activityManagerStyles.input]}
-                    placeholder="Activity name (e.g., Morning Jog)"
-                    value={newActivity.name}
-                    onChangeText={(text) => setNewActivity(prev => ({ ...prev, name: text }))}
-                  />
-                  <TextInput
-                    style={[globalStyles.input, activityManagerStyles.input]}
-                    placeholder="Emoji (e.g., 🏃‍♂️)"
-                    value={newActivity.emoji}
-                    onChangeText={(text) => setNewActivity(prev => ({ ...prev, emoji: text }))}
-                    maxLength={2}
-                  />
-                  <View style={activityManagerStyles.formButtons}>
-                    <TouchableOpacity
-                      style={[globalStyles.secondaryButton, activityManagerStyles.cancelButton]}
-                      onPress={() => {
-                        setShowAddActivityForm(false);
-                        setNewActivity({ name: '', emoji: '', categoryName: '' });
-                      }}
-                    >
-                      <Text style={globalStyles.secondaryButtonText}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[globalStyles.button, activityManagerStyles.addButton]}
-                      onPress={handleAddActivity}
-                    >
-                      <Text style={globalStyles.buttonText}>Add Activity</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ) : (
-                <TouchableOpacity
-                  style={[globalStyles.button, activityManagerStyles.showFormButton]}
-                  onPress={() => setShowAddActivityForm(true)}
-                >
-                  <Text style={globalStyles.buttonText}>+ Add New Activity</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          ) : (
-            <View style={activityManagerStyles.section}>
-              <Text style={activityManagerStyles.sectionTitle}>Activity Categories</Text>
-              
-              {categories.length === 0 ? (
-                <View style={activityManagerStyles.emptyState}>
-                  <Text style={activityManagerStyles.emptyStateText}>
-                    No categories created yet. Create your first category to organize activities!
-                  </Text>
-                </View>
-              ) : (
-                <FlatList
-                  data={categories}
-                  renderItem={renderCategory}
-                  keyExtractor={(item) => item.id}
-                  showsVerticalScrollIndicator={false}
-                  scrollEnabled={false}
-                />
-              )}
-
-              {showAddCategoryForm ? (
-                <View style={activityManagerStyles.addForm}>
-                  <Text style={activityManagerStyles.formTitle}>Add New Category</Text>
-                  <TextInput
-                    style={[globalStyles.input, activityManagerStyles.input]}
-                    placeholder="Category name (e.g., Fitness, Work, Hobbies)"
-                    value={newCategory.name}
-                    onChangeText={(text) => setNewCategory(prev => ({ ...prev, name: text }))}
-                  />
-                  <TextInput
-                    style={[globalStyles.input, activityManagerStyles.input]}
-                    placeholder="Emoji (e.g., 💪)"
-                    value={newCategory.emoji}
-                    onChangeText={(text) => setNewCategory(prev => ({ ...prev, emoji: text }))}
-                    maxLength={2}
-                  />
-                  <View style={activityManagerStyles.formButtons}>
-                    <TouchableOpacity
-                      style={[globalStyles.secondaryButton, activityManagerStyles.cancelButton]}
-                      onPress={() => {
-                        setShowAddCategoryForm(false);
-                        setNewCategory({ name: '', emoji: '' });
-                      }}
-                    >
-                      <Text style={globalStyles.secondaryButtonText}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[globalStyles.button, activityManagerStyles.addButton]}
-                      onPress={handleAddCategory}
-                    >
-                      <Text style={globalStyles.buttonText}>Add Category</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ) : (
-                <TouchableOpacity
-                  style={[globalStyles.button, activityManagerStyles.showFormButton]}
-                  onPress={() => setShowAddCategoryForm(true)}
-                >
-                  <Text style={globalStyles.buttonText}>+ Add New Category</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
-        </View>
-      </ScrollView>
+        removeClippedSubviews={false}
+        nestedScrollEnabled={false}
+      />
     </View>
   );
 };

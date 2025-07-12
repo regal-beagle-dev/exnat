@@ -1,13 +1,12 @@
 import React from 'react';
 import {
-  FlatList,
   Text,
   TouchableOpacity,
   View
 } from 'react-native';
 import { globalStyles } from '../../constants/Theme';
 import { activityManagerStyles } from '../../styles/ActivityManagerStyles';
-import { Activity, ActivityCategory } from './interfaces';
+import { ActivityCategory } from './interfaces';
 import { ActivityManagerProps } from './props';
 
 const ActivityManager: React.FC<ActivityManagerProps> = ({
@@ -21,18 +20,6 @@ const ActivityManager: React.FC<ActivityManagerProps> = ({
     return category ? category.name : 'No Category';
   };
   
-  const renderActivity = ({ item }: { item: Activity }) => (
-    <View style={activityManagerStyles.activityItem}>
-      <View style={activityManagerStyles.activityInfo}>
-        <Text style={activityManagerStyles.activityEmoji}>{item.emoji}</Text>
-        <View style={activityManagerStyles.activityDetails}>
-          <Text style={activityManagerStyles.activityName}>{item.name}</Text>
-          <Text style={activityManagerStyles.activityType}>{getCategoryName(item.category)}</Text>
-        </View>
-      </View>
-    </View>
-  );
-  
   return (
     <View style={activityManagerStyles.container}>
       <Text style={activityManagerStyles.description}>
@@ -40,14 +27,19 @@ const ActivityManager: React.FC<ActivityManagerProps> = ({
       </Text>
 
       {visibleActivities.length > 0 ? (
-        <FlatList
-          data={visibleActivities}
-          renderItem={renderActivity}
-          keyExtractor={(item) => item.id}
-          style={activityManagerStyles.activitiesList}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={true}
-        />
+        <View style={activityManagerStyles.activitiesList}>
+          {visibleActivities.map((item) => (
+            <View key={item.id} style={activityManagerStyles.activityItem}>
+              <View style={activityManagerStyles.activityInfo}>
+                <Text style={activityManagerStyles.activityEmoji}>{item.emoji}</Text>
+                <View style={activityManagerStyles.activityDetails}>
+                  <Text style={activityManagerStyles.activityName}>{item.name}</Text>
+                  <Text style={activityManagerStyles.activityType}>{getCategoryName(item.category)}</Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
       ) : (
         <View style={activityManagerStyles.emptyState}>
           <Text style={activityManagerStyles.emptyStateText}>
