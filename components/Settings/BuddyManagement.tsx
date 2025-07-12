@@ -11,7 +11,7 @@ const BuddyManagement: React.FC<BuddyManagementProps> = ({
   return (
     <View style={buddyManagementStyles.container}>
       <Text style={buddyManagementStyles.description}>
-        Add family members and friends to share your outdoor adventures with
+      Add family members and/or friends to track activities!
       </Text>
 
       <View style={buddyManagementStyles.summary}>

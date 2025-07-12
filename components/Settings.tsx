@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { globalStyles } from '../constants/Theme';
+import ActivityDetailManager from './Settings/ActivityDetailManager';
 import ActivityManager from './Settings/ActivityManager';
 import BuddyManagement from './Settings/BuddyManagement';
 import BuddyManager from './Settings/BuddyManager';
 import DefaultTimeRanges from './Settings/DefaultTimeRanges';
-import { Activity, Buddy, SettingsData } from './Settings/interfaces';
+import { Activity, ActivityCategory, Buddy, SettingsData } from './Settings/interfaces';
 import { SettingsProps } from './Settings/props';
 import SettingsHeader from './Settings/SettingsHeader';
 import SettingsSection from './Settings/SettingsSection';
@@ -13,6 +14,14 @@ import TimeFormatToggle from './Settings/TimeFormatToggle';
 
 const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   const [showBuddyManager, setShowBuddyManager] = useState(false);
+  const [showActivityDetailManager, setShowActivityDetailManager] = useState(false);
+
+  // Define categories first so they can be referenced in activities
+  const fitnessCategory: ActivityCategory = { id: '1', name: 'Fitness', emoji: '💪' };
+  const workCategory: ActivityCategory = { id: '2', name: 'Work', emoji: '💼' };
+  const personalCategory: ActivityCategory = { id: '3', name: 'Personal', emoji: '🏠' };
+  const hobbyCategory: ActivityCategory = { id: '4', name: 'Hobby', emoji: '🎨' };
+
   const [settingsData, setSettingsData] = useState<SettingsData>({
     useMilitaryTime: false,
     defaultTimeRanges: {
@@ -22,16 +31,29 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
     activities: [
       {
         id: '1',
-        type: 'Exercise',
         name: 'Morning Jog',
         emoji: '🏃‍♂️',
+        category: fitnessCategory,
       },
       {
         id: '2',
-        type: 'Work',
         name: 'Deep Focus',
         emoji: '💻',
+        category: workCategory,
       },
+      {
+        id: '3',
+        name: 'Reading',
+        emoji: '📚',
+        category: hobbyCategory,
+        hidden: true,
+      },
+    ],
+    activityCategories: [
+      fitnessCategory,
+      workCategory,
+      personalCategory,
+      hobbyCategory,
     ],
     buddies: [
       {
@@ -41,8 +63,8 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
       },
       {
         id: '2',
-        name: 'Dad',
-        relationship: 'Father',
+        name: 'Ted',
+        relationship: 'Child',
       },
     ],
   });
@@ -74,6 +96,15 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
     }));
   };
 
+  // Activity handlers
+  const handleNavigateToActivityManager = () => {
+    setShowActivityDetailManager(true);
+  };
+
+  const handleCloseActivityManager = () => {
+    setShowActivityDetailManager(false);
+  };
+
   const handleAddActivity = (activity: Omit<Activity, 'id'>) => {
     const newActivity: Activity = {
       ...activity,
@@ -93,6 +124,37 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
     }));
   };
 
+  const handleToggleActivityVisibility = (id: string) => {
+    setSettingsData(prev => ({
+      ...prev,
+      activities: prev.activities.map(activity =>
+        activity.id === id
+          ? { ...activity, hidden: !activity.hidden }
+          : activity
+      ),
+    }));
+  };
+
+  const handleAddCategory = (category: Omit<ActivityCategory, 'id'>) => {
+    const newCategory: ActivityCategory = {
+      ...category,
+      id: Date.now().toString(),
+    };
+    
+    setSettingsData(prev => ({
+      ...prev,
+      activityCategories: [...prev.activityCategories, newCategory],
+    }));
+  };
+
+  const handleRemoveCategory = (id: string) => {
+    setSettingsData(prev => ({
+      ...prev,
+      activityCategories: prev.activityCategories.filter(category => category.id !== id),
+    }));
+  };
+
+  // Buddy handlers
   const handleNavigateToBuddyManager = () => {
     setShowBuddyManager(true);
   };
@@ -119,6 +181,21 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
       buddies: prev.buddies.filter(buddy => buddy.id !== id),
     }));
   };
+
+  if (showActivityDetailManager) {
+    return (
+      <ActivityDetailManager
+        onClose={handleCloseActivityManager}
+        activities={settingsData.activities}
+        categories={settingsData.activityCategories}
+        onAddActivity={handleAddActivity}
+        onRemoveActivity={handleRemoveActivity}
+        onToggleActivityVisibility={handleToggleActivityVisibility}
+        onAddCategory={handleAddCategory}
+        onRemoveCategory={handleRemoveCategory}
+      />
+    );
+  }
 
   if (showBuddyManager) {
     return (
@@ -159,8 +236,8 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
         <SettingsSection title="Activities">
           <ActivityManager
             activities={settingsData.activities}
-            onAddActivity={handleAddActivity}
-            onRemoveActivity={handleRemoveActivity}
+            categories={settingsData.activityCategories}
+            onNavigateToActivityManager={handleNavigateToActivityManager}
           />
         </SettingsSection>
 

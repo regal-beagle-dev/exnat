@@ -5,13 +5,78 @@ export const activityManagerStyles = StyleSheet.create({
   container: {
     gap: Spacing.md,
   },
+  scrollContent: {
+    paddingBottom: Spacing.xl,
+  },
+  content: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    gap: Spacing.lg,
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: Colors.text,
+    textAlign: 'center',
+  },
+  pageDescription: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
   description: {
     fontSize: 14,
     color: Colors.textSecondary,
     lineHeight: 20,
   },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: 8,
+    padding: 4,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  activeTab: {
+    backgroundColor: Colors.surface,
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.textSecondary,
+  },
+  activeTabText: {
+    color: Colors.text,
+  },
+  section: {
+    gap: Spacing.md,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  emptyState: {
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: 8,
+    paddingVertical: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
   activitiesList: {
-    maxHeight: 200,
+    maxHeight: 300,
   },
   activityItem: {
     flexDirection: 'row',
@@ -58,7 +123,16 @@ export const activityManagerStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   addForm: {
-    gap: Spacing.sm,
+    gap: Spacing.md,
+    backgroundColor: Colors.surface,
+    borderRadius: 8,
+    padding: Spacing.lg,
+  },
+  formTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: Spacing.sm,
   },
   input: {
     marginVertical: 0,

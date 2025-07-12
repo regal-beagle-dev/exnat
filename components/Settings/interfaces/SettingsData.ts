@@ -1,5 +1,5 @@
 import { TimeRange } from '../../TimeTracker/interfaces';
-import { Activity } from './Activity';
+import { Activity, ActivityCategory } from './Activity';
 import { Buddy } from './Buddy';
 
 export interface SettingsData {
@@ -9,5 +9,6 @@ export interface SettingsData {
     evening: TimeRange;
   };
   activities: Activity[];
+  activityCategories: ActivityCategory[];
   buddies: Buddy[];
 }

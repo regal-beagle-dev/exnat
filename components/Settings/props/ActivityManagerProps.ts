@@ -1,7 +1,7 @@
-import { Activity } from '../interfaces';
+import { Activity, ActivityCategory } from '../interfaces';
 
 export interface ActivityManagerProps {
   activities: Activity[];
-  onAddActivity: (activity: Omit<Activity, 'id'>) => void;
-  onRemoveActivity: (id: string) => void;
+  categories: ActivityCategory[];
+  onNavigateToActivityManager: () => void;
 }

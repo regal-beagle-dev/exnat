@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import {
-    Alert,
-    FlatList,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { globalStyles } from '../../constants/Theme';
 import { buddyManagerStyles } from '../../styles/BuddyManagerStyles';
@@ -52,10 +52,15 @@ const BuddyManager: React.FC<BuddyManagerProps> = ({
     );
   };
 
+  const randomEmoji = () => {
+    const emojis = ['😎', '👨‍🚒', '😊', '👦', '🤩'];
+    return emojis[Math.floor(Math.random() * emojis.length)];
+  }
+
   const renderBuddy = ({ item }: { item: Buddy }) => (
     <View style={buddyManagerStyles.buddyItem}>
       <View style={buddyManagerStyles.buddyInfo}>
-        <Text style={buddyManagerStyles.buddyEmoji}>👤</Text>
+        <Text style={buddyManagerStyles.buddyEmoji}>{randomEmoji()}</Text>
         <View style={buddyManagerStyles.buddyDetails}>
           <Text style={buddyManagerStyles.buddyName}>{item.name}</Text>
           <Text style={buddyManagerStyles.buddyRelationship}>{item.relationship}</Text>
@@ -82,7 +87,7 @@ const BuddyManager: React.FC<BuddyManagerProps> = ({
         <View style={buddyManagerStyles.content}>
           <Text style={buddyManagerStyles.pageTitle}>Buddy Management</Text>
           <Text style={buddyManagerStyles.pageDescription}>
-            Add family members and friends to track shared outdoor activities and adventures
+            Add family members and/or friends track activities!
           </Text>
 
           <View style={buddyManagerStyles.buddiesSection}>
