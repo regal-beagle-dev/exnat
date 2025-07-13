@@ -227,8 +227,8 @@ The Form has been integrated into the ActivityDetailManager component, replacing
 />
 
 // After
-<Form<NewActivityFormData>
-  fields={newActivityFormFields}
+<Form<ActivityFormData>
+  fields={getActivityFormFields({ mode: 'create' })}
   onSubmit={handleAddActivity}
   submitButtonText="Add Activity"
   showCancelButton={true}

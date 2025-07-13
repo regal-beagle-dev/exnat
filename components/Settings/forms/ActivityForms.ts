@@ -1,17 +1,29 @@
 import { FormFieldConfig } from '../../core/forms';
+import { Activity, ActivityCategory } from '../interfaces';
 
-export interface NewActivityFormData {
+export interface ActivityFormData {
   categoryName: string;
   name: string;
   emoji: string;
 }
 
-export interface NewCategoryFormData {
+export interface CategoryFormData {
   name: string;
   emoji: string;
 }
 
-export const newActivityFormFields: FormFieldConfig<NewActivityFormData>[] = [
+export interface ActivityFormConfig {
+  mode: 'create' | 'update';
+  initialData?: Activity;
+  categories?: ActivityCategory[];
+}
+
+export interface CategoryFormConfig {
+  mode: 'create' | 'update';
+  initialData?: ActivityCategory;
+}
+
+export const getActivityFormFields = (config: ActivityFormConfig): FormFieldConfig<ActivityFormData>[] => [
   {
     name: 'categoryName',
     label: 'Category',
@@ -41,16 +53,17 @@ export const newActivityFormFields: FormFieldConfig<NewActivityFormData>[] = [
     maxLength: 2,
     rules: {
       required: 'Emoji is required',
-      validate: (value: string) => {
-        // Basic emoji validation - check if it contains emoji-like characters
-        const emojiRegex = /[\u2600-\u26FF\u2700-\u27BF\u1F300-\u1F5FF\u1F600-\u1F64F\u1F680-\u1F6FF\u1F1E0-\u1F1FF]/;
-        return emojiRegex.test(value) || 'Please enter a valid emoji';
-      },
     },
   },
 ];
 
-export const newCategoryFormFields: FormFieldConfig<NewCategoryFormData>[] = [
+export const getActivityFormDefaultValues = (config: ActivityFormConfig): Partial<ActivityFormData> => ({
+  categoryName: config.initialData?.category?.name || '',
+  name: config.initialData?.name || '',
+  emoji: config.initialData?.emoji || '',
+});
+
+export const getCategoryFormFields = (config: CategoryFormConfig): FormFieldConfig<CategoryFormData>[] => [
   {
     name: 'name',
     label: 'Category Name',
@@ -74,11 +87,11 @@ export const newCategoryFormFields: FormFieldConfig<NewCategoryFormData>[] = [
     maxLength: 2,
     rules: {
       required: 'Emoji is required',
-      validate: (value: string) => {
-        // Basic emoji validation - check if it contains emoji-like characters
-        const emojiRegex = /[\u2600-\u26FF\u2700-\u27BF\u1F300-\u1F5FF\u1F600-\u1F64F\u1F680-\u1F6FF\u1F1E0-\u1F1FF]/;
-        return emojiRegex.test(value) || 'Please enter a valid emoji';
-      },
     },
   },
 ];
+
+export const getCategoryFormDefaultValues = (config: CategoryFormConfig): Partial<CategoryFormData> => ({
+  name: config.initialData?.name || '',
+  emoji: config.initialData?.emoji || '',
+});

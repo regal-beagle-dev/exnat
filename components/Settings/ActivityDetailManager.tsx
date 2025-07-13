@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -8,13 +9,6 @@ import {
 } from 'react-native';
 import { globalStyles } from '../../constants/Theme';
 import { activityManagerStyles } from '../../styles/ActivityManagerStyles';
-import { Form } from '../core/forms';
-import {
-  NewActivityFormData,
-  newActivityFormFields,
-  NewCategoryFormData,
-  newCategoryFormFields
-} from './forms/ActivityForms';
 import { Activity, ActivityCategory } from './interfaces';
 import { ActivityDetailManagerProps } from './props';
 import SettingsHeader from './SettingsHeader';
@@ -30,35 +24,22 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
   onRemoveCategory,
 }) => {
   const [activeTab, setActiveTab] = useState<'activities' | 'categories'>('activities');
-  const [showAddActivityForm, setShowAddActivityForm] = useState(false);
-  const [showAddCategoryForm, setShowAddCategoryForm] = useState(false);
+  const router = useRouter();
 
-  const handleAddActivity = (data: NewActivityFormData) => {
-    let selectedCategory: ActivityCategory | undefined;
-    if (data.categoryName.trim()) {
-      selectedCategory = categories.find(cat => cat.name === data.categoryName.trim());
-      if (!selectedCategory) {
-        Alert.alert('Error', `Category "${data.categoryName}" not found`);
-        return;
-      }
-    }
-
-    onAddActivity({
-      name: data.name.trim(),
-      emoji: data.emoji.trim(),
-      category: selectedCategory,
-    });
-
-    setShowAddActivityForm(false);
+  const handleCreateActivity = () => {
+    router.push('/activityForm?mode=create');
   };
 
-  const handleAddCategory = (data: NewCategoryFormData) => {
-    onAddCategory({
-      name: data.name.trim(),
-      emoji: data.emoji.trim(),
-    });
+  const handleEditActivity = (activity: Activity) => {
+    router.push(`/activityForm?mode=update&activityId=${activity.id}`);
+  };
 
-    setShowAddCategoryForm(false);
+  const handleCreateCategory = () => {
+    router.push('/categoryForm?mode=create');
+  };
+
+  const handleEditCategory = (category: ActivityCategory) => {
+    router.push(`/categoryForm?mode=update&categoryId=${category.id}`);
   };
 
   const handleRemoveActivity = (id: string, name: string) => {
@@ -114,6 +95,12 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <TouchableOpacity
+          style={[activityManagerStyles.removeButton, { backgroundColor: '#2196F3', marginRight: 8 }]}
+          onPress={() => handleEditActivity(item)}
+        >
+          <Text style={activityManagerStyles.removeButtonText}>✏️</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
           style={[activityManagerStyles.removeButton, { backgroundColor: item.hidden ? '#4CAF50' : '#FF9800', marginRight: 8 }]}
           onPress={() => handleToggleVisibility(item.id, item.name, item.hidden || false)}
         >
@@ -139,12 +126,20 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
           <Text style={activityManagerStyles.activityName}>{item.name}</Text>
         </View>
       </View>
-      <TouchableOpacity
-        style={activityManagerStyles.removeButton}
-        onPress={() => handleRemoveCategory(item.id, item.name)}
-      >
-        <Text style={activityManagerStyles.removeButtonText}>✕</Text>
-      </TouchableOpacity>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <TouchableOpacity
+          style={[activityManagerStyles.removeButton, { backgroundColor: '#2196F3', marginRight: 8 }]}
+          onPress={() => handleEditCategory(item)}
+        >
+          <Text style={activityManagerStyles.removeButtonText}>✏️</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={activityManagerStyles.removeButton}
+          onPress={() => handleRemoveCategory(item.id, item.name)}
+        >
+          <Text style={activityManagerStyles.removeButtonText}>✕</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -196,43 +191,19 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
   const renderListFooter = () => (
     <View style={activityManagerStyles.content}>
       {activeTab === 'activities' ? (
-        showAddActivityForm ? (
-          <Form<NewActivityFormData>
-            fields={newActivityFormFields}
-            onSubmit={handleAddActivity}
-            submitButtonText="Add Activity"
-            showCancelButton={true}
-            cancelButtonText="Cancel"
-            onCancel={() => setShowAddActivityForm(false)}
-            style={activityManagerStyles.addForm}
-          />
-        ) : (
-          <TouchableOpacity
-            style={[globalStyles.button, activityManagerStyles.showFormButton]}
-            onPress={() => setShowAddActivityForm(true)}
-          >
-            <Text style={globalStyles.buttonText}>+ Add New Activity</Text>
-          </TouchableOpacity>
-        )
+        <TouchableOpacity
+          style={[globalStyles.button, activityManagerStyles.showFormButton]}
+          onPress={handleCreateActivity}
+        >
+          <Text style={globalStyles.buttonText}>+ Add New Activity</Text>
+        </TouchableOpacity>
       ) : (
-        showAddCategoryForm ? (
-          <Form<NewCategoryFormData>
-            fields={newCategoryFormFields}
-            onSubmit={handleAddCategory}
-            submitButtonText="Add Category"
-            showCancelButton={true}
-            cancelButtonText="Cancel"
-            onCancel={() => setShowAddCategoryForm(false)}
-            style={activityManagerStyles.addForm}
-          />
-        ) : (
-          <TouchableOpacity
-            style={[globalStyles.button, activityManagerStyles.showFormButton]}
-            onPress={() => setShowAddCategoryForm(true)}
-          >
-            <Text style={globalStyles.buttonText}>+ Add New Category</Text>
-          </TouchableOpacity>
-        )
+        <TouchableOpacity
+          style={[globalStyles.button, activityManagerStyles.showFormButton]}
+          onPress={handleCreateCategory}
+        >
+          <Text style={globalStyles.buttonText}>+ Add New Category</Text>
+        </TouchableOpacity>
       )}
     </View>
   );

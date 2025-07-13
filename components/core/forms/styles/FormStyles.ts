@@ -3,44 +3,49 @@ import { BorderRadius, Colors, Spacing } from '../../../../constants/Theme';
 
 export const formStyles = StyleSheet.create({
   formContainer: {
-    gap: Spacing.md,
+    flex: 1,
+    gap: Spacing.lg,
   },
   fieldContainer: {
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.md,
   },
   fieldLabel: {
     fontSize: 16,
     fontWeight: '600',
     color: Colors.text,
-    marginBottom: Spacing.xs,
+    marginBottom: Spacing.sm,
   },
   fieldInput: {
     marginVertical: 0,
+    fontSize: 16,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
   },
   fieldInputError: {
     borderColor: Colors.error,
     borderWidth: 2,
   },
   multilineInput: {
-    minHeight: 80,
+    minHeight: 100,
     textAlignVertical: 'top',
     paddingTop: Spacing.md,
   },
   helpText: {
     fontSize: 14,
     color: Colors.textSecondary,
-    marginTop: Spacing.xs,
+    marginTop: Spacing.sm,
     lineHeight: 20,
   },
   errorText: {
     fontSize: 14,
     color: Colors.error,
-    marginTop: Spacing.xs,
+    marginTop: Spacing.sm,
     fontWeight: '500',
   },
   actionsContainer: {
+    marginTop: 'auto',
+    paddingTop: Spacing.xl,
     gap: Spacing.md,
-    marginTop: Spacing.lg,
   },
   actionsRow: {
     flexDirection: 'row',
@@ -48,6 +53,7 @@ export const formStyles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
+    minHeight: 50,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,

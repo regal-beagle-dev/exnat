@@ -156,4 +156,48 @@ export const globalStyles = StyleSheet.create({
     color: Colors.text,
     lineHeight: 24,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.surfaceSecondary,
+    backgroundColor: Colors.surface,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text,
+    textAlign: 'center',
+    flex: 1,
+  },
+  headerButton: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    minWidth: 60,
+  },
+  headerButtonText: {
+    fontSize: 16,
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+  backButton: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    minWidth: 60,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+  headerSpacer: {
+    width: 60,
+  },
+  content: {
+    flex: 1,
+    padding: Spacing.lg,
+  },
 });
