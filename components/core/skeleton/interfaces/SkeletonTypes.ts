@@ -4,6 +4,7 @@ export interface SkeletonProps {
   fieldCount?: number;
   showActions?: boolean;
   showHeader?: boolean;
+  buttonLayout?: 'single' | 'double';
   style?: ViewStyle;
 }
 

@@ -105,6 +105,7 @@ export default function ActivityFormScreen() {
             isLoading={isLoading}
             fieldCount={formFields.length}
             type="animated"
+            buttonLayout="double"
           >
             <Form<ActivityFormData>
               fields={formFields}

@@ -40,6 +40,16 @@ export const skeletonStyles = StyleSheet.create({
     backgroundColor: Colors.surfaceSecondary,
     borderRadius: BorderRadius.md,
   },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+  },
+  buttonSkeletonHalf: {
+    flex: 1,
+    height: 50,
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: BorderRadius.md,
+  },
   animatedSkeleton: {
     backgroundColor: Colors.surfaceSecondary,
   },

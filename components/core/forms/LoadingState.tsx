@@ -30,6 +30,7 @@ function LoadingState({
   fieldCount = 3,
   showActions = true,
   showHeader = false,
+  buttonLayout = 'single',
   style,
   children,
 }: LoadingStateProps) {
@@ -44,6 +45,7 @@ function LoadingState({
           fieldCount={fieldCount}
           showActions={showActions}
           showHeader={showHeader}
+          buttonLayout={buttonLayout}
           style={style}
         />
       );
@@ -53,6 +55,7 @@ function LoadingState({
           fieldCount={fieldCount}
           showActions={showActions}
           showHeader={showHeader}
+          buttonLayout={buttonLayout}
           style={style}
         />
       );

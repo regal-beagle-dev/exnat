@@ -19,6 +19,7 @@ function FormSkeleton({
   fieldCount = 3, 
   showActions = true, 
   showHeader = false,
+  buttonLayout = 'single',
   style 
 }: SkeletonProps) {
   return (
@@ -36,7 +37,14 @@ function FormSkeleton({
       
       {showActions && (
         <View style={skeletonStyles.actionsContainer}>
-          <View style={skeletonStyles.buttonSkeleton} />
+          {buttonLayout === 'double' ? (
+            <View style={skeletonStyles.buttonRow}>
+              <View style={skeletonStyles.buttonSkeletonHalf} />
+              <View style={skeletonStyles.buttonSkeletonHalf} />
+            </View>
+          ) : (
+            <View style={skeletonStyles.buttonSkeleton} />
+          )}
         </View>
       )}
     </View>

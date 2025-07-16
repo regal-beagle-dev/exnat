@@ -20,6 +20,7 @@ function FormSkeletonAnimated({
   fieldCount = 3, 
   showActions = true, 
   showHeader = false,
+  buttonLayout = 'single',
   style 
 }: SkeletonProps) {
   return (
@@ -51,11 +52,28 @@ function FormSkeletonAnimated({
       
       {showActions && (
         <View style={skeletonStyles.actionsContainer}>
-          <SubtleSkeleton 
-            width="100%" 
-            height={50} 
-            borderRadius={12}
-          />
+          {buttonLayout === 'double' ? (
+            <View style={skeletonStyles.buttonRow}>
+              <SubtleSkeleton 
+                width="100%" 
+                height={50} 
+                borderRadius={12}
+                style={{ flex: 1 }}
+              />
+              <SubtleSkeleton 
+                width="100%" 
+                height={50} 
+                borderRadius={12}
+                style={{ flex: 1 }}
+              />
+            </View>
+          ) : (
+            <SubtleSkeleton 
+              width="100%" 
+              height={50} 
+              borderRadius={12}
+            />
+          )}
         </View>
       )}
     </View>

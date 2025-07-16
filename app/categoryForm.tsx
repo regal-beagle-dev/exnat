@@ -95,6 +95,7 @@ export default function CategoryFormScreen() {
             isLoading={isLoading}
             fieldCount={formFields.length}
             type="animated"
+            buttonLayout="double"
           >
             <Form<CategoryFormData>
               fields={formFields}
