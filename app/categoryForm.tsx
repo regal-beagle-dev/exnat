@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FormHeader } from '../components/common';
@@ -10,30 +10,34 @@ import {
   getCategoryFormDefaultValues,
   getCategoryFormFields,
 } from '../components/Settings/forms/ActivityForms';
+import { ActivityCategory } from '../components/Settings/interfaces';
 import { globalStyles } from '../constants/Theme';
-
-// Mock category storage - replace with actual backend calls
-const mockCategories = new Map([
-  ['cat1', { id: 'cat1', name: 'Exercise', emoji: '💪' }],
-  ['cat2', { id: 'cat2', name: 'Learning', emoji: '🧠' }],
-  ['cat3', { id: 'cat3', name: 'Work', emoji: '💼' }],
-]);
+import { serviceProvider } from '../services';
 
 export default function CategoryFormScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categoryData, setCategoryData] = useState<ActivityCategory | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
   
   const mode = (params.mode as 'create' | 'update') || 'create';
   const categoryId = params.categoryId as string;
   
-  // Memoized category data - in real app, this would come from a data store/context
-  const categoryData = useMemo(() => {
+  const categoryService = serviceProvider.getCategoryService();
+
+  useEffect(() => {
     if (mode === 'update' && categoryId) {
-      return mockCategories.get(categoryId);
+      setIsLoading(true);
+      categoryService.getCategory(categoryId)
+        .then(setCategoryData)
+        .catch(error => {
+          console.error('Failed to load category:', error);
+          Alert.alert('Error', 'Failed to load category data');
+        })
+        .finally(() => setIsLoading(false));
     }
-    return undefined;
-  }, [mode, categoryId]);
+  }, [mode, categoryId, categoryService]);
 
   const config: CategoryFormConfig = useMemo(() => ({
     mode,
@@ -43,33 +47,25 @@ export default function CategoryFormScreen() {
   const formFields = useMemo(() => getCategoryFormFields(config), [config]);
   const defaultValues = useMemo(() => getCategoryFormDefaultValues(config), [config]);
   
-  // Memoized submit handler
   const handleSubmit = useCallback(async (data: CategoryFormData) => {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
       if (mode === 'create') {
         const newCategory = {
-          id: `category_${Date.now()}`,
           name: data.name.trim(),
           emoji: data.emoji.trim(),
         };
         
-        // TODO: Replace with actual API call
-        console.log('Creating category:', newCategory);
+        await categoryService.createCategory(newCategory);
         Alert.alert('Success', 'Category created successfully');
       } else {
-        const updatedCategory = {
-          id: categoryId,
+        const updates = {
           name: data.name.trim(),
           emoji: data.emoji.trim(),
         };
         
-        // TODO: Replace with actual API call  
-        console.log('Updating category:', updatedCategory);
+        await categoryService.updateCategory(categoryId, updates);
         Alert.alert('Success', 'Category updated successfully');
       }
       
@@ -80,7 +76,7 @@ export default function CategoryFormScreen() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [mode, categoryId, router]);
+  }, [mode, categoryId, categoryService, router]);
 
   const handleCancel = useCallback(() => {
     router.back();
@@ -102,7 +98,7 @@ export default function CategoryFormScreen() {
             submitButtonText={mode === 'create' ? 'Create Category' : 'Update Category'}
             showCancelButton={true}
             onCancel={handleCancel}
-            isLoading={isSubmitting}
+            isLoading={isSubmitting || isLoading}
           />
         </View>
       </View>

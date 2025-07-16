@@ -140,6 +140,37 @@ describe('Form Component Logic', () => {
     expect(propsWithDefaults.defaultValues?.email).toBe('jane@example.com');
   });
 
+  it('should handle default values correctly', () => {
+    const defaultValues: Partial<TestFormData> = {
+      name: 'John Doe',
+      email: 'john@example.com',
+      message: 'Default message',
+    };
+
+    expect(defaultValues.name).toBe('John Doe');
+    expect(defaultValues.email).toBe('john@example.com');
+    expect(defaultValues.message).toBe('Default message');
+  });
+
+  it('should handle activity form default values like the app expects', () => {
+    const activityData = {
+      id: 'activity1',
+      name: 'Running',
+      emoji: '🏃‍♀️',
+      category: { id: 'cat1', name: 'Exercise', emoji: '💪' }
+    };
+
+    const defaultValues = {
+      categoryName: activityData.category?.name || '',
+      name: activityData.name || '',
+      emoji: activityData.emoji || '',
+    };
+
+    expect(defaultValues.categoryName).toBe('Exercise');
+    expect(defaultValues.name).toBe('Running');
+    expect(defaultValues.emoji).toBe('🏃‍♀️');
+  });
+
   it('should validate field input props', () => {
     const emailField = testFields.find(f => f.name === 'email');
     

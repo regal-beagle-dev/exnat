@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FormHeader } from '../components/common';
@@ -10,29 +10,34 @@ import {
   getActivityFormDefaultValues,
   getActivityFormFields,
 } from '../components/Settings/forms/ActivityForms';
+import { Activity } from '../components/Settings/interfaces';
 import { globalStyles } from '../constants/Theme';
-
-// Mock activity storage - replace with actual backend calls
-const mockActivities = new Map([
-  ['activity1', { id: 'activity1', name: 'Jog', emoji: '🏃‍♂️', category: { id: 'cat1', name: 'Exercise', emoji: '💪' } }],
-  ['activity2', { id: 'activity2', name: 'Reading', emoji: '📚', category: { id: 'cat2', name: 'Relax', emoji: '🧠' } }],
-]);
+import { serviceProvider } from '../services';
 
 export default function ActivityFormScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activityData, setActivityData] = useState<Activity | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
   
   const mode = (params.mode as 'create' | 'update') || 'create';
   const activityId = params.activityId as string;
   
-  // Memoized activity data - in real app, this would come from a data store/context
-  const activityData = useMemo(() => {
+  const activityService = serviceProvider.getActivityService();
+
+  useEffect(() => {
     if (mode === 'update' && activityId) {
-      return mockActivities.get(activityId);
+      setIsLoading(true);
+      activityService.getActivity(activityId)
+        .then(setActivityData)
+        .catch(error => {
+          console.error('Failed to load activity:', error);
+          Alert.alert('Error', 'Failed to load activity data');
+        })
+        .finally(() => setIsLoading(false));
     }
-    return undefined;
-  }, [mode, activityId]);
+  }, [mode, activityId, activityService]);
 
   const config: ActivityFormConfig = useMemo(() => ({
     mode,
@@ -42,17 +47,12 @@ export default function ActivityFormScreen() {
   const formFields = useMemo(() => getActivityFormFields(config), [config]);
   const defaultValues = useMemo(() => getActivityFormDefaultValues(config), [config]);
   
-  // Memoized submit handler
   const handleSubmit = useCallback(async (data: ActivityFormData) => {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
       if (mode === 'create') {
         const newActivity = {
-          id: `activity_${Date.now()}`,
           name: data.name.trim(),
           emoji: data.emoji.trim(),
           category: data.categoryName.trim() ? { 
@@ -62,12 +62,10 @@ export default function ActivityFormScreen() {
           } : undefined,
         };
         
-        // TODO: Replace with actual API call
-        console.log('Creating activity:', newActivity);
+        await activityService.createActivity(newActivity);
         Alert.alert('Success', 'Activity created successfully');
       } else {
-        const updatedActivity = {
-          id: activityId,
+        const updates = {
           name: data.name.trim(),
           emoji: data.emoji.trim(),
           category: data.categoryName.trim() ? { 
@@ -77,8 +75,7 @@ export default function ActivityFormScreen() {
           } : undefined,
         };
         
-        // TODO: Replace with actual API call  
-        console.log('Updating activity:', updatedActivity);
+        await activityService.updateActivity(activityId, updates);
         Alert.alert('Success', 'Activity updated successfully');
       }
       
@@ -89,7 +86,7 @@ export default function ActivityFormScreen() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [mode, activityId, activityData, router]);
+  }, [mode, activityId, activityData, activityService, router]);
 
   const handleCancel = useCallback(() => {
     router.back();
@@ -111,7 +108,7 @@ export default function ActivityFormScreen() {
             submitButtonText={mode === 'create' ? 'Create Activity' : 'Update Activity'}
             showCancelButton={true}
             onCancel={handleCancel}
-            isLoading={isSubmitting}
+            isLoading={isSubmitting || isLoading}
           />
         </View>
       </View>

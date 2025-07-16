@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import FormActions from './FormActions';
@@ -29,6 +29,12 @@ function Form<T extends FieldValues>({
     defaultValues: defaultValues as any,
     mode: 'onChange',
   });
+
+  useEffect(() => {
+    if (defaultValues) {
+      reset(defaultValues as any);
+    }
+  }, [defaultValues, reset]);
 
   const handleFormSubmit = async (data: T) => {
     try {
