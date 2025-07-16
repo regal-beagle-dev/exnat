@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FormHeader } from '../components/common';
-import { Form } from '../components/core/forms';
+import { Form, LoadingState } from '../components/core/forms';
 import {
   ActivityFormConfig,
   ActivityFormData,
@@ -101,15 +101,21 @@ export default function ActivityFormScreen() {
         />
         
         <View style={globalStyles.content}>
-          <Form<ActivityFormData>
-            fields={formFields}
-            onSubmit={handleSubmit}
-            defaultValues={defaultValues}
-            submitButtonText={mode === 'create' ? 'Create Activity' : 'Update Activity'}
-            showCancelButton={true}
-            onCancel={handleCancel}
-            isLoading={isSubmitting || isLoading}
-          />
+          <LoadingState 
+            isLoading={isLoading}
+            fieldCount={formFields.length}
+            type="animated"
+          >
+            <Form<ActivityFormData>
+              fields={formFields}
+              onSubmit={handleSubmit}
+              defaultValues={defaultValues}
+              submitButtonText={mode === 'create' ? 'Create Activity' : 'Update Activity'}
+              showCancelButton={true}
+              onCancel={handleCancel}
+              isLoading={isSubmitting}
+            />
+          </LoadingState>
         </View>
       </View>
     </SafeAreaView>
