@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FormHeader } from '../components/common';
-import { Form } from '../components/core/forms';
+import { Form, LoadingState } from '../components/core/forms';
 import {
   CategoryFormConfig,
   CategoryFormData,
@@ -91,15 +91,21 @@ export default function CategoryFormScreen() {
         />
         
         <View style={globalStyles.content}>
-          <Form<CategoryFormData>
-            fields={formFields}
-            onSubmit={handleSubmit}
-            defaultValues={defaultValues}
-            submitButtonText={mode === 'create' ? 'Create Category' : 'Update Category'}
-            showCancelButton={true}
-            onCancel={handleCancel}
-            isLoading={isSubmitting || isLoading}
-          />
+          <LoadingState 
+            isLoading={isLoading}
+            fieldCount={formFields.length}
+            type="animated"
+          >
+            <Form<CategoryFormData>
+              fields={formFields}
+              onSubmit={handleSubmit}
+              defaultValues={defaultValues}
+              submitButtonText={mode === 'create' ? 'Create Category' : 'Update Category'}
+              showCancelButton={true}
+              onCancel={handleCancel}
+              isLoading={isSubmitting}
+            />
+          </LoadingState>
         </View>
       </View>
     </SafeAreaView>
