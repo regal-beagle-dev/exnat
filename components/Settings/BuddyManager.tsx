@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useRouter } from 'expo-router';
+import React from 'react';
 import {
-  Alert,
-  FlatList,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    FlatList,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { globalStyles } from '../../constants/Theme';
 import { buddyManagerStyles } from '../../styles/BuddyManagerStyles';
@@ -19,25 +19,14 @@ const BuddyManager: React.FC<BuddyManagerProps> = ({
   onAddBuddy,
   onRemoveBuddy,
 }) => {
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newBuddy, setNewBuddy] = useState({
-    name: '',
-    relationship: '',
-  });
+  const router = useRouter();
 
-  const handleAddBuddy = () => {
-    if (!newBuddy.name.trim() || !newBuddy.relationship.trim()) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
+  const handleCreateBuddy = () => {
+    router.push('/buddyForm?mode=create');
+  };
 
-    onAddBuddy({
-      name: newBuddy.name.trim(),
-      relationship: newBuddy.relationship.trim(),
-    });
-
-    setNewBuddy({ name: '', relationship: '' });
-    setShowAddForm(false);
+  const handleEditBuddy = (buddy: Buddy) => {
+    router.push(`/buddyForm?mode=update&buddyId=${buddy.id}`);
   };
 
   const handleRemoveBuddy = (id: string, name: string) => {
@@ -54,10 +43,13 @@ const BuddyManager: React.FC<BuddyManagerProps> = ({
   const randomEmoji = () => {
     const emojis = ['😎', '👨‍🚒', '😊', '👦', '🤩'];
     return emojis[Math.floor(Math.random() * emojis.length)];
-  }
+  };
 
   const renderBuddy = ({ item }: { item: Buddy }) => (
-    <View style={buddyManagerStyles.buddyItem}>
+    <TouchableOpacity
+      style={buddyManagerStyles.buddyItem}
+      onPress={() => handleEditBuddy(item)}
+    >
       <View style={buddyManagerStyles.buddyInfo}>
         <Text style={buddyManagerStyles.buddyEmoji}>{randomEmoji()}</Text>
         <View style={buddyManagerStyles.buddyDetails}>
@@ -67,11 +59,14 @@ const BuddyManager: React.FC<BuddyManagerProps> = ({
       </View>
       <TouchableOpacity
         style={buddyManagerStyles.removeButton}
-        onPress={() => handleRemoveBuddy(item.id, item.name)}
+        onPress={(e) => {
+          e.stopPropagation();
+          handleRemoveBuddy(item.id, item.name);
+        }}
       >
         <Text style={buddyManagerStyles.removeButtonText}>✕</Text>
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -105,48 +100,12 @@ const BuddyManager: React.FC<BuddyManagerProps> = ({
         )}
         ListFooterComponent={() => (
           <View style={buddyManagerStyles.content}>
-
-            {showAddForm ? (
-              <View style={buddyManagerStyles.addForm}>
-                <Text style={buddyManagerStyles.formTitle}>Add New Buddy</Text>
-                <TextInput
-                  style={[globalStyles.input, buddyManagerStyles.input]}
-                  placeholder="Buddy's name (e.g., Sarah, Dad, Alex)"
-                  value={newBuddy.name}
-                  onChangeText={(text) => setNewBuddy(prev => ({ ...prev, name: text }))}
-                />
-                <TextInput
-                  style={[globalStyles.input, buddyManagerStyles.input]}
-                  placeholder="Relationship (e.g., Sister, Friend, Spouse)"
-                  value={newBuddy.relationship}
-                  onChangeText={(text) => setNewBuddy(prev => ({ ...prev, relationship: text }))}
-                />
-                <View style={buddyManagerStyles.formButtons}>
-                  <TouchableOpacity
-                    style={[globalStyles.secondaryButton, buddyManagerStyles.cancelButton]}
-                    onPress={() => {
-                      setShowAddForm(false);
-                      setNewBuddy({ name: '', relationship: '' });
-                    }}
-                  >
-                    <Text style={globalStyles.secondaryButtonText}>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[globalStyles.button, buddyManagerStyles.addButton]}
-                    onPress={handleAddBuddy}
-                  >
-                    <Text style={globalStyles.buttonText}>Add Buddy</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ) : (
-              <TouchableOpacity
-                style={[globalStyles.button, buddyManagerStyles.showFormButton]}
-                onPress={() => setShowAddForm(true)}
-              >
-                <Text style={globalStyles.buttonText}>+ Add New Buddy</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={[globalStyles.button, buddyManagerStyles.showFormButton]}
+              onPress={handleCreateBuddy}
+            >
+              <Text style={globalStyles.buttonText}>+ Add New Buddy</Text>
+            </TouchableOpacity>
           </View>
         )}
       />

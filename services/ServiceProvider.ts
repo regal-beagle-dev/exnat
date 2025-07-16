@@ -1,5 +1,6 @@
 import { API_BASE_URL, USE_MOCK_SERVICES } from '../config/environment';
 import { ActivityService, ApiActivityService, MockActivityService } from './ActivityService';
+import { ApiBuddyService, BuddyService, MockBuddyService } from './BuddyService';
 import { ApiCategoryService, CategoryService, MockCategoryService } from './CategoryService';
 
 export interface ServiceConfig {
@@ -11,6 +12,7 @@ export class ServiceProvider {
   private config: ServiceConfig;
   private activityService?: ActivityService;
   private categoryService?: CategoryService;
+  private buddyService?: BuddyService;
 
   constructor(config: ServiceConfig) {
     this.config = config;
@@ -34,10 +36,20 @@ export class ServiceProvider {
     return this.categoryService;
   }
 
+  getBuddyService(): BuddyService {
+    if (!this.buddyService) {
+      this.buddyService = this.config.useMocks
+        ? new MockBuddyService()
+        : new ApiBuddyService(this.config.apiBaseUrl || '');
+    }
+    return this.buddyService;
+  }
+
   updateConfig(config: Partial<ServiceConfig>): void {
     this.config = { ...this.config, ...config };
     this.activityService = undefined;
     this.categoryService = undefined;
+    this.buddyService = undefined;
   }
 }
 
