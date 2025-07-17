@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { serviceProvider } from '../../services';
 import { defaultTimeRangesStyles } from '../../styles/DefaultTimeRangesStyles';
+import TimeRangePicker from '../core/TimeRangePicker';
 import { DefaultTimeRangesProps } from './props';
-import TimeRangePicker from './TimeRangePicker';
 
 const DefaultTimeRanges: React.FC<DefaultTimeRangesProps> = ({
   morningRange,
@@ -49,14 +49,16 @@ const DefaultTimeRanges: React.FC<DefaultTimeRangesProps> = ({
         range={morningRange}
         onRangeChange={handleMorningRangeChange}
         useMilitaryTime={useMilitaryTime}
-        label="Morning Range"
+        label="AM Range"
+        timePeriod="AM"
       />
 
       <TimeRangePicker
         range={eveningRange}
         onRangeChange={handleEveningRangeChange}
         useMilitaryTime={useMilitaryTime}
-        label="Evening Range"
+        label="PM Range"
+        timePeriod="PM"
       />
     </View>
   );

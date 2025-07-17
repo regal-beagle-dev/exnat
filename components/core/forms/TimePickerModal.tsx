@@ -11,6 +11,8 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
   initialTime = new Date(),
   mode = 'time',
   useMilitaryTime = false,
+  minimumTime,
+  maximumTime,
 }) => {
   const [selectedTime, setSelectedTime] = React.useState(initialTime);
 
@@ -40,6 +42,8 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
         is24Hour={useMilitaryTime}
         onChange={handleTimeChange}
         display="default"
+        minimumDate={minimumTime}
+        maximumDate={maximumTime}
       />
     ) : null;
   }
@@ -72,6 +76,8 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
               onChange={handleTimeChange}
               display="spinner"
               style={timePickerStyles.picker}
+              minimumDate={minimumTime}
+              maximumDate={maximumTime}
             />
           </View>
         </View>
