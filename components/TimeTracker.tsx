@@ -1,23 +1,25 @@
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Alert,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { Colors, globalStyles } from '../constants/Theme';
 import { useTimeTracker, type TimeSlot as TimeSlotType } from '../hooks/useTimeTracker';
+import { serviceProvider } from '../services';
+import { DefaultTimeRanges } from '../services/TimeRangeService';
 import { timeTrackerStyles } from '../styles/TimeTrackerStyles';
 import {
-  CustomTimeModal,
-  InstructionCard,
-  SelectedRangesList,
-  TimeModeToggle,
-  TimeSlot,
-  TimeTrackerHeader,
+    CustomTimeModal,
+    InstructionCard,
+    SelectedRangesList,
+    TimeModeToggle,
+    TimeSlot,
+    TimeTrackerHeader,
 } from './TimeTracker/';
 import { TimeTrackerProps } from './TimeTracker/props';
 
@@ -37,6 +39,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
     addCustomTimeRange,
     removeRange,
     getFilteredTimeSlots,
+    clearAllRanges,
   } = useTimeTracker();
 
   const [showCustomTime, setShowCustomTime] = useState(false);
@@ -44,6 +47,50 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
   const [customEndTime, setCustomEndTime] = useState('');
   const [timeMode, setTimeMode] = useState<'AM' | 'PM'>('AM');
   const [lastPressTime, setLastPressTime] = useState(0);
+  const [defaultTimeRanges, setDefaultTimeRanges] = useState<DefaultTimeRanges | null>(null);
+
+  const timeRangeService = serviceProvider.getTimeRangeService();
+
+  useEffect(() => {
+    const loadDefaultTimeRanges = async () => {
+      try {
+        const ranges = await timeRangeService.getDefaultTimeRanges();
+        setDefaultTimeRanges(ranges);
+      } catch (error) {
+        console.error('Failed to load default time ranges:', error);
+      }
+    };
+
+    loadDefaultTimeRanges();
+  }, [timeRangeService]);
+
+  const handleApplyDefaultRanges = useCallback(async () => {
+    if (!defaultTimeRanges) return;
+
+    try {
+      clearAllRanges();
+      
+      const morningResult = addCustomTimeRange(
+        `${defaultTimeRanges.morning.start.toString().padStart(2, '0')}:00`,
+        `${defaultTimeRanges.morning.end.toString().padStart(2, '0')}:00`
+      );
+      
+      const eveningResult = addCustomTimeRange(
+        `${defaultTimeRanges.evening.start.toString().padStart(2, '0')}:00`,
+        `${defaultTimeRanges.evening.end.toString().padStart(2, '0')}:00`
+      );
+
+      if (!morningResult.success || !eveningResult.success) {
+        Alert.alert('Error', 'Failed to apply default time ranges');
+        return;
+      }
+
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      console.error('Failed to apply default ranges:', error);
+      Alert.alert('Error', 'Failed to apply default time ranges');
+    }
+  }, [defaultTimeRanges, clearAllRanges, addCustomTimeRange]);
 
   const handleSlotPress = useCallback(async (time: number) => {
     // Debounce rapid successive touches
@@ -183,6 +230,17 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
         />
 
         <View style={timeTrackerStyles.actionButtons}>
+          {defaultTimeRanges && (
+            <TouchableOpacity
+              style={[globalStyles.button, timeTrackerStyles.customTimeButton]}
+              onPress={handleApplyDefaultRanges}
+            >
+              <Text style={[globalStyles.buttonText, timeTrackerStyles.customTimeText]}>
+                🕐 Apply Default Times
+              </Text>
+            </TouchableOpacity>
+          )}
+          
           <TouchableOpacity
             style={[globalStyles.button, timeTrackerStyles.customTimeButton]}
             onPress={() => setShowCustomTime(true)}

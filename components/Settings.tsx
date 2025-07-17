@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { globalStyles } from '../constants/Theme';
+import { serviceProvider } from '../services';
 import ActivityDetailManager from './Settings/ActivityDetailManager';
 import ActivityManager from './Settings/ActivityManager';
 import BuddyManagement from './Settings/BuddyManagement';
@@ -15,6 +16,7 @@ import TimeFormatToggle from './Settings/TimeFormatToggle';
 const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   const [showBuddyManager, setShowBuddyManager] = useState(false);
   const [showActivityDetailManager, setShowActivityDetailManager] = useState(false);
+  const [isLoadingTimeRanges, setIsLoadingTimeRanges] = useState(true);
 
   // Define categories first so they can be referenced in activities
   const fitnessCategory: ActivityCategory = { id: '1', name: 'Fitness', emoji: '💪' };
@@ -25,8 +27,8 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   const [settingsData, setSettingsData] = useState<SettingsData>({
     useMilitaryTime: false,
     defaultTimeRanges: {
-      morning: { start: 6, end: 12 }, // 6AM - 12PM // FIXME: MAGIC
-      evening: { start: 12, end: 22 }, // 12PM - 10PM // FIXME: MAGIC
+      morning: { start: 6, end: 12 },
+      evening: { start: 12, end: 22 },
     },
     activities: [
       {
@@ -68,6 +70,26 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
       },
     ],
   });
+
+  const timeRangeService = serviceProvider.getTimeRangeService();
+
+  useEffect(() => {
+    const loadDefaultTimeRanges = async () => {
+      try {
+        const defaultRanges = await timeRangeService.getDefaultTimeRanges();
+        setSettingsData(prev => ({
+          ...prev,
+          defaultTimeRanges: defaultRanges,
+        }));
+      } catch (error) {
+        console.error('Failed to load default time ranges:', error);
+      } finally {
+        setIsLoadingTimeRanges(false);
+      }
+    };
+
+    loadDefaultTimeRanges();
+  }, [timeRangeService]);
 
   const handleTimeFormatToggle = (useMilitaryTime: boolean) => {
     setSettingsData(prev => ({

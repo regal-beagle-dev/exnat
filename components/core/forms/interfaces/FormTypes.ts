@@ -1,6 +1,8 @@
 import { Control, FieldValues, Path, RegisterOptions } from 'react-hook-form';
 import { TextInputProps, ViewStyle } from 'react-native';
 
+export type FormFieldType = 'text' | 'time';
+
 export interface FormFieldConfig<T extends FieldValues> {
   name: Path<T>;
   label: string;
@@ -15,6 +17,8 @@ export interface FormFieldConfig<T extends FieldValues> {
   maxLength?: number;
   helpText?: string;
   containerStyle?: ViewStyle;
+  fieldType?: FormFieldType;
+  useMilitaryTime?: boolean;
 }
 
 export interface FormProps<T extends FieldValues> {

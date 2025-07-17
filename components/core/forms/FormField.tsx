@@ -4,6 +4,7 @@ import { Text, TextInput, View } from 'react-native';
 import { Colors, globalStyles } from '../../../constants/Theme';
 import { FormFieldProps } from './interfaces';
 import { formStyles } from './styles/FormStyles';
+import TimePickerField from './TimePickerField';
 
 function FormField<T extends FieldValues>({ 
   field, 
@@ -24,7 +25,32 @@ function FormField<T extends FieldValues>({
     maxLength,
     helpText,
     containerStyle,
+    fieldType = 'text',
+    useMilitaryTime = false,
   } = field;
+
+  if (fieldType === 'time') {
+    return (
+      <View style={[formStyles.fieldContainer, containerStyle]}>
+        <Controller
+          name={name}
+          control={control}
+          rules={rules}
+          render={({ field: { onChange, value } }) => (
+            <TimePickerField
+              label={label}
+              value={value}
+              onTimeChange={onChange}
+              placeholder={placeholder}
+              useMilitaryTime={useMilitaryTime}
+              error={error}
+              helpText={helpText}
+            />
+          )}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={[formStyles.fieldContainer, containerStyle]}>

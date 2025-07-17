@@ -1,7 +1,9 @@
-import React from 'react';
-import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { Text, View } from 'react-native';
+import { serviceProvider } from '../../services';
 import { defaultTimeRangesStyles } from '../../styles/DefaultTimeRangesStyles';
 import { DefaultTimeRangesProps } from './props';
+import TimeRangePicker from './TimeRangePicker';
 
 const DefaultTimeRanges: React.FC<DefaultTimeRangesProps> = ({
   morningRange,
@@ -10,27 +12,31 @@ const DefaultTimeRanges: React.FC<DefaultTimeRangesProps> = ({
   onEveningRangeChange,
   useMilitaryTime,
 }) => {
-  const formatTime = (hour: number): string => {
-    if (useMilitaryTime) {
-      return `${hour.toString().padStart(2, '0')}:00`;
+  const [isUpdating, setIsUpdating] = useState(false);
+  const timeRangeService = serviceProvider.getTimeRangeService();
+
+  const handleMorningRangeChange = async (range: typeof morningRange) => {
+    setIsUpdating(true);
+    try {
+      await timeRangeService.updateMorningRange(range);
+      onMorningRangeChange(range);
+    } catch (error) {
+      console.error('Failed to update morning range:', error);
+    } finally {
+      setIsUpdating(false);
     }
-    
-    if (hour === 0) return '12:00 AM';
-    if (hour === 12) return '12:00 PM';
-    if (hour < 12) return `${hour}:00 AM`;
-    return `${hour - 12}:00 PM`;
   };
 
-  const formatRange = (start: number, end: number): string => {
-    return `${formatTime(start)} - ${formatTime(end)}`;
-  };
-
-  const handleEditRange = (type: 'morning' | 'evening') => {
-    Alert.alert(
-      `Edit ${type === 'morning' ? 'Morning' : 'Evening'} Range`,
-      'Time picker functionality would go here',
-      [{ text: 'OK' }]
-    );
+  const handleEveningRangeChange = async (range: typeof eveningRange) => {
+    setIsUpdating(true);
+    try {
+      await timeRangeService.updateEveningRange(range);
+      onEveningRangeChange(range);
+    } catch (error) {
+      console.error('Failed to update evening range:', error);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -39,31 +45,19 @@ const DefaultTimeRanges: React.FC<DefaultTimeRangesProps> = ({
         Set default time ranges that will be pre-selected when tracking time
       </Text>
       
-      <View style={defaultTimeRangesStyles.rangeContainer}>
-        <Text style={defaultTimeRangesStyles.rangeLabel}>Morning Range</Text>
-        <TouchableOpacity 
-          style={defaultTimeRangesStyles.rangeButton}
-          onPress={() => handleEditRange('morning')}
-        >
-          <Text style={defaultTimeRangesStyles.rangeText}>
-            {formatRange(morningRange.start, morningRange.end)}
-          </Text>
-          <Text style={defaultTimeRangesStyles.editIcon}>✏️</Text>
-        </TouchableOpacity>
-      </View>
+      <TimeRangePicker
+        range={morningRange}
+        onRangeChange={handleMorningRangeChange}
+        useMilitaryTime={useMilitaryTime}
+        label="Morning Range"
+      />
 
-      <View style={defaultTimeRangesStyles.rangeContainer}>
-        <Text style={defaultTimeRangesStyles.rangeLabel}>Evening Range</Text>
-        <TouchableOpacity 
-          style={defaultTimeRangesStyles.rangeButton}
-          onPress={() => handleEditRange('evening')}
-        >
-          <Text style={defaultTimeRangesStyles.rangeText}>
-            {formatRange(eveningRange.start, eveningRange.end)}
-          </Text>
-          <Text style={defaultTimeRangesStyles.editIcon}>✏️</Text>
-        </TouchableOpacity>
-      </View>
+      <TimeRangePicker
+        range={eveningRange}
+        onRangeChange={handleEveningRangeChange}
+        useMilitaryTime={useMilitaryTime}
+        label="Evening Range"
+      />
     </View>
   );
 };
