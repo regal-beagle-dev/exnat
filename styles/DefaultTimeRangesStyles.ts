@@ -32,7 +32,4 @@ export const defaultTimeRangesStyles = StyleSheet.create({
     color: Colors.text,
     fontWeight: '500',
   },
-  editIcon: {
-    fontSize: 16,
-  },
 });

@@ -1,11 +1,11 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Alert,
-  FlatList,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    FlatList,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { globalStyles } from '../../constants/Theme';
 import { activityManagerStyles } from '../../styles/ActivityManagerStyles';
@@ -81,7 +81,10 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
   };
 
   const renderActivity = ({ item }: { item: Activity }) => (
-    <View style={[activityManagerStyles.activityItem, item.hidden && { opacity: 0.6 }]}>
+    <TouchableOpacity 
+      style={[activityManagerStyles.activityItem, item.hidden && { opacity: 0.6 }]}
+      onPress={() => handleEditActivity(item)}
+    >
       <View style={activityManagerStyles.activityInfo}>
         <Text style={activityManagerStyles.activityEmoji}>{item.emoji}</Text>
         <View style={activityManagerStyles.activityDetails}>
@@ -95,14 +98,11 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <TouchableOpacity
-          style={[activityManagerStyles.removeButton, { backgroundColor: '#2196F3', marginRight: 8 }]}
-          onPress={() => handleEditActivity(item)}
-        >
-          <Text style={activityManagerStyles.removeButtonText}>✏️</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
           style={[activityManagerStyles.removeButton, { backgroundColor: item.hidden ? '#4CAF50' : '#FF9800', marginRight: 8 }]}
-          onPress={() => handleToggleVisibility(item.id, item.name, item.hidden || false)}
+          onPress={(e) => {
+            e.stopPropagation();
+            handleToggleVisibility(item.id, item.name, item.hidden || false);
+          }}
         >
           <Text style={activityManagerStyles.removeButtonText}>
             {item.hidden ? '👁️' : '🙈'}
@@ -110,16 +110,22 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
         </TouchableOpacity>
         <TouchableOpacity
           style={activityManagerStyles.removeButton}
-          onPress={() => handleRemoveActivity(item.id, item.name)}
+          onPress={(e) => {
+            e.stopPropagation();
+            handleRemoveActivity(item.id, item.name);
+          }}
         >
           <Text style={activityManagerStyles.removeButtonText}>✕</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderCategory = ({ item }: { item: ActivityCategory }) => (
-    <View style={activityManagerStyles.activityItem}>
+    <TouchableOpacity 
+      style={activityManagerStyles.activityItem}
+      onPress={() => handleEditCategory(item)}
+    >
       <View style={activityManagerStyles.activityInfo}>
         <Text style={activityManagerStyles.activityEmoji}>{item.emoji}</Text>
         <View style={activityManagerStyles.activityDetails}>
@@ -128,19 +134,16 @@ const ActivityDetailManager: React.FC<ActivityDetailManagerProps> = ({
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <TouchableOpacity
-          style={[activityManagerStyles.removeButton, { backgroundColor: '#2196F3', marginRight: 8 }]}
-          onPress={() => handleEditCategory(item)}
-        >
-          <Text style={activityManagerStyles.removeButtonText}>✏️</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
           style={activityManagerStyles.removeButton}
-          onPress={() => handleRemoveCategory(item.id, item.name)}
+          onPress={(e) => {
+            e.stopPropagation();
+            handleRemoveCategory(item.id, item.name);
+          }}
         >
           <Text style={activityManagerStyles.removeButtonText}>✕</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderListHeader = () => (

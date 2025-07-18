@@ -1,11 +1,11 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
 import {
-  Alert,
-  FlatList,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    FlatList,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { globalStyles } from '../../constants/Theme';
 import { buddyManagerStyles } from '../../styles/BuddyManagerStyles';
@@ -46,7 +46,10 @@ const BuddyManager: React.FC<BuddyManagerProps> = ({
   };
 
   const renderBuddy = ({ item }: { item: Buddy }) => (
-    <View style={buddyManagerStyles.buddyItem}>
+    <TouchableOpacity 
+      style={buddyManagerStyles.buddyItem}
+      onPress={() => handleEditBuddy(item)}
+    >
       <View style={buddyManagerStyles.buddyInfo}>
         <Text style={buddyManagerStyles.buddyEmoji}>{randomEmoji()}</Text>
         <View style={buddyManagerStyles.buddyDetails}>
@@ -56,19 +59,16 @@ const BuddyManager: React.FC<BuddyManagerProps> = ({
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <TouchableOpacity
-          style={[buddyManagerStyles.removeButton, { backgroundColor: '#2196F3', marginRight: 8 }]}
-          onPress={() => handleEditBuddy(item)}
-        >
-          <Text style={buddyManagerStyles.removeButtonText}>✏️</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
           style={buddyManagerStyles.removeButton}
-          onPress={() => handleRemoveBuddy(item.id, item.name)}
+          onPress={(e) => {
+            e.stopPropagation();
+            handleRemoveBuddy(item.id, item.name);
+          }}
         >
           <Text style={buddyManagerStyles.removeButtonText}>✕</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

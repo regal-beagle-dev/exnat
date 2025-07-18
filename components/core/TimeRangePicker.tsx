@@ -118,7 +118,6 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
           <Text style={defaultTimeRangesStyles.rangeText}>
             Start: {formatTime(range.start)}
           </Text>
-          <Text style={defaultTimeRangesStyles.editIcon}>✏️</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
@@ -128,7 +127,6 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
           <Text style={defaultTimeRangesStyles.rangeText}>
             End: {formatTime(range.end)}
           </Text>
-          <Text style={defaultTimeRangesStyles.editIcon}>✏️</Text>
         </TouchableOpacity>
       </View>
 
