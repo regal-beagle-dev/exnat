@@ -2,24 +2,25 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-    Alert,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Colors, globalStyles } from '../constants/Theme';
+import { Colors, globalStyles, Spacing } from '../constants/Theme';
 import { useTimeTracker, type TimeSlot as TimeSlotType } from '../hooks/useTimeTracker';
 import { serviceProvider } from '../services';
 import { DefaultTimeRanges } from '../services/TimeRangeService';
 import { timeTrackerStyles } from '../styles/TimeTrackerStyles';
+import { IndividualTimeRangePicker } from './core';
 import {
-    CustomTimeModal,
-    InstructionCard,
-    SelectedRangesList,
-    TimeModeToggle,
-    TimeSlot,
-    TimeTrackerHeader,
+  CustomTimeModal,
+  InstructionCard,
+  SelectedRangesList,
+  TimeModeToggle,
+  TimeSlot,
+  TimeTrackerHeader,
 } from './TimeTracker/';
 import { TimeTrackerProps } from './TimeTracker/props';
 
@@ -43,6 +44,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
   } = useTimeTracker();
 
   const [showCustomTime, setShowCustomTime] = useState(false);
+  const [showDayRangeForm, setShowDayRangeForm] = useState(false);
   const [customStartTime, setCustomStartTime] = useState('');
   const [customEndTime, setCustomEndTime] = useState('');
   const [timeMode, setTimeMode] = useState<'AM' | 'PM'>('AM');
@@ -91,6 +93,32 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
       Alert.alert('Error', 'Failed to apply default time ranges');
     }
   }, [defaultTimeRanges, clearAllRanges, addCustomTimeRange]);
+
+  const handleApplyCustomDayRanges = useCallback(async (ranges: DefaultTimeRanges) => {
+    try {
+      clearAllRanges();
+      
+      const morningResult = addCustomTimeRange(
+        `${ranges.morning.start.toString().padStart(2, '0')}:00`,
+        `${ranges.morning.end.toString().padStart(2, '0')}:00`
+      );
+      
+      const eveningResult = addCustomTimeRange(
+        `${ranges.evening.start.toString().padStart(2, '0')}:00`,
+        `${ranges.evening.end.toString().padStart(2, '0')}:00`
+      );
+
+      if (!morningResult.success || !eveningResult.success) {
+        Alert.alert('Error', 'Failed to apply custom time ranges');
+        return;
+      }
+
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      console.error('Failed to apply custom day ranges:', error);
+      Alert.alert('Error', 'Failed to apply custom time ranges');
+    }
+  }, [clearAllRanges, addCustomTimeRange]);
 
   const handleSlotPress = useCallback(async (time: number) => {
     // Debounce rapid successive touches
@@ -163,7 +191,11 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
     if (isYesterday) {
       date.setDate(date.getDate() - 1);
     }
-    return date.toLocaleDateString('en-US', { 
+    return date;
+  };
+
+  const getCurrentDateString = () => {
+    return getCurrentDate().toLocaleDateString('en-US', { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
@@ -199,11 +231,24 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
       <ScrollView contentContainerStyle={timeTrackerStyles.scrollContent}>
         <TimeTrackerHeader
           title="Track Your Time Outside"
-          date={getCurrentDate()}
+          date={getCurrentDateString()}
           onBack={onClose}
         />
 
         <InstructionCard />
+
+        {defaultTimeRanges && (
+          <View style={{ paddingHorizontal: Spacing.lg, marginVertical: Spacing.sm }}>
+            <TouchableOpacity
+              style={[globalStyles.button, timeTrackerStyles.customTimeButton]}
+              onPress={() => setShowDayRangeForm(true)}
+            >
+              <Text style={[globalStyles.buttonText, timeTrackerStyles.customTimeText]}>
+                📅 Alter AM/PM Ranges
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         <View style={[globalStyles.card, timeTrackerStyles.timeGrid]}>
           <Text style={timeTrackerStyles.gridTitle}>Select Hours (24-hour format)</Text>
@@ -230,17 +275,6 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
         />
 
         <View style={timeTrackerStyles.actionButtons}>
-          {defaultTimeRanges && (
-            <TouchableOpacity
-              style={[globalStyles.button, timeTrackerStyles.customTimeButton]}
-              onPress={handleApplyDefaultRanges}
-            >
-              <Text style={[globalStyles.buttonText, timeTrackerStyles.customTimeText]}>
-                🕐 Apply Default Times
-              </Text>
-            </TouchableOpacity>
-          )}
-          
           <TouchableOpacity
             style={[globalStyles.button, timeTrackerStyles.customTimeButton]}
             onPress={() => setShowCustomTime(true)}
@@ -281,6 +315,14 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
         onCustomEndTimeChange={setCustomEndTime}
         onClose={() => setShowCustomTime(false)}
         onAdd={handleAddCustomTimeRange}
+      />
+
+      <IndividualTimeRangePicker
+        isVisible={showDayRangeForm}
+        onClose={() => setShowDayRangeForm(false)}
+        onApply={handleApplyCustomDayRanges}
+        initialRanges={defaultTimeRanges || undefined}
+        date={getCurrentDate()}
       />
     </LinearGradient>
   );
