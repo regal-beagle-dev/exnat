@@ -1,5 +1,6 @@
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { globalStyles } from '../constants/Theme';
 import { serviceProvider } from '../services';
@@ -18,6 +19,11 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   const router = useRouter();
   const [showBuddyManager, setShowBuddyManager] = useState(false);
   const [showActivityDetailManager, setShowActivityDetailManager] = useState(false);
+
+  const timeRangeService = serviceProvider.getTimeRangeService();
+  const buddyService = serviceProvider.getBuddyService();
+  const activityService = serviceProvider.getActivityService();
+  const categoryService = serviceProvider.getCategoryService();
 
   // Define categories first so they can be referenced in activities
   const fitnessCategory: ActivityCategory = { id: '1', name: 'Fitness', emoji: '💪' };
@@ -72,23 +78,32 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
     ],
   });
 
-  const timeRangeService = serviceProvider.getTimeRangeService();
+  const loadAllData = useCallback(async () => {
+    try {
+      const [defaultRanges, allBuddies, allActivities, allCategories] = await Promise.all([
+        timeRangeService.getDefaultTimeRanges(),
+        buddyService.getAllBuddies(),
+        activityService.getAllActivities(),
+        categoryService.getAllCategories(),
+      ]);
 
-  useEffect(() => {
-    const loadDefaultTimeRanges = async () => {
-      try {
-        const defaultRanges = await timeRangeService.getDefaultTimeRanges();
-        setSettingsData(prev => ({
-          ...prev,
-          defaultTimeRanges: defaultRanges,
-        }));
-      } catch (error) {
-        console.error('Failed to load default time ranges:', error);
-      }
-    };
+      setSettingsData(prev => ({
+        ...prev,
+        defaultTimeRanges: defaultRanges,
+        buddies: allBuddies,
+        activities: allActivities,
+        activityCategories: allCategories,
+      }));
+    } catch (error) {
+      console.error('Failed to load settings data:', error);
+    }
+  }, [timeRangeService, buddyService, activityService, categoryService]);
 
-    loadDefaultTimeRanges();
-  }, [timeRangeService]);
+  useFocusEffect(
+    useCallback(() => {
+      loadAllData();
+    }, [loadAllData])
+  );
 
   const handleTimeFormatToggle = (useMilitaryTime: boolean) => {
     setSettingsData(prev => ({
