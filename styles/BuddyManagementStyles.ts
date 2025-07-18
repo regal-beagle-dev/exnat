@@ -28,8 +28,9 @@ export const buddyManagementStyles = StyleSheet.create({
     alignItems: 'center',
   },
   buddyName: {
-    fontSize: 14,
-    color: Colors.textSecondary,
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
   },
   moreText: {
     fontSize: 14,
@@ -38,5 +39,46 @@ export const buddyManagementStyles = StyleSheet.create({
   },
   manageButton: {
     marginTop: Spacing.sm,
+  },
+  buddiesList: {
+    gap: Spacing.sm,
+  },
+  buddyItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: 8,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
+  },
+  buddyInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  buddyEmoji: {
+    fontSize: 24,
+    marginRight: Spacing.md,
+  },
+  buddyDetails: {
+    flex: 1,
+  },
+  buddyRelationship: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  emptyState: {
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: 8,
+    paddingVertical: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
   },
 });

@@ -13,6 +13,7 @@ const ActivityManager: React.FC<ActivityManagerProps> = ({
   activities,
   categories,
   onNavigateToActivityManager,
+  onEditActivity,
 }) => {
   const visibleActivities = activities.filter(activity => !activity.hidden);
   
@@ -29,7 +30,11 @@ const ActivityManager: React.FC<ActivityManagerProps> = ({
       {visibleActivities.length > 0 ? (
         <View style={activityManagerStyles.activitiesList}>
           {visibleActivities.map((item) => (
-            <View key={item.id} style={activityManagerStyles.activityItem}>
+            <TouchableOpacity 
+              key={item.id} 
+              style={activityManagerStyles.activityItem}
+              onPress={() => onEditActivity?.(item)}
+            >
               <View style={activityManagerStyles.activityInfo}>
                 <Text style={activityManagerStyles.activityEmoji}>{item.emoji}</Text>
                 <View style={activityManagerStyles.activityDetails}>
@@ -37,7 +42,7 @@ const ActivityManager: React.FC<ActivityManagerProps> = ({
                   <Text style={activityManagerStyles.activityType}>{getCategoryName(item.category)}</Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       ) : (
@@ -47,15 +52,6 @@ const ActivityManager: React.FC<ActivityManagerProps> = ({
           </Text>
         </View>
       )}
-
-      <View style={activityManagerStyles.container}>
-        <Text style={activityManagerStyles.description}>
-          {visibleActivities.length} enabled activities
-          {activities.length > visibleActivities.length && 
-            ` (${activities.length - visibleActivities.length} disabled)`
-          }
-        </Text>
-      </View>
 
       <TouchableOpacity
         style={[globalStyles.button, activityManagerStyles.showFormButton]}

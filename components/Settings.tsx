@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { globalStyles } from '../constants/Theme';
@@ -14,9 +15,9 @@ import SettingsSection from './Settings/SettingsSection';
 import TimeFormatToggle from './Settings/TimeFormatToggle';
 
 const Settings: React.FC<SettingsProps> = ({ onClose }) => {
+  const router = useRouter();
   const [showBuddyManager, setShowBuddyManager] = useState(false);
   const [showActivityDetailManager, setShowActivityDetailManager] = useState(false);
-  const [isLoadingTimeRanges, setIsLoadingTimeRanges] = useState(true);
 
   // Define categories first so they can be referenced in activities
   const fitnessCategory: ActivityCategory = { id: '1', name: 'Fitness', emoji: '💪' };
@@ -83,8 +84,6 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
         }));
       } catch (error) {
         console.error('Failed to load default time ranges:', error);
-      } finally {
-        setIsLoadingTimeRanges(false);
       }
     };
 
@@ -204,6 +203,14 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
     }));
   };
 
+  const handleEditActivity = (activity: Activity) => {
+    router.push(`/activityForm?mode=update&activityId=${activity.id}`);
+  };
+
+  const handleEditBuddy = (buddy: Buddy) => {
+    router.push(`/buddyForm?mode=update&buddyId=${buddy.id}`);
+  };
+
   if (showActivityDetailManager) {
     return (
       <ActivityDetailManager
@@ -260,6 +267,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
             activities={settingsData.activities}
             categories={settingsData.activityCategories}
             onNavigateToActivityManager={handleNavigateToActivityManager}
+            onEditActivity={handleEditActivity}
           />
         </SettingsSection>
 
@@ -267,6 +275,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
           <BuddyManagement
             buddies={settingsData.buddies}
             onNavigateToBuddyManager={handleNavigateToBuddyManager}
+            onEditBuddy={handleEditBuddy}
           />
         </SettingsSection>
       </ScrollView>

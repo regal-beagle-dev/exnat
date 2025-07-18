@@ -7,35 +7,44 @@ import { BuddyManagementProps } from './props';
 const BuddyManagement: React.FC<BuddyManagementProps> = ({
   buddies,
   onNavigateToBuddyManager,
+  onEditBuddy,
 }) => {
+  const randomEmoji = () => {
+    const emojis = ['😎', '👨‍🚒', '😊', '👦', '🤩'];
+    return emojis[Math.floor(Math.random() * emojis.length)];
+  };
+
   return (
     <View style={buddyManagementStyles.container}>
       <Text style={buddyManagementStyles.description}>
-      Add family members and/or friends to track activities!
+        Add family members and/or friends to track activities!
       </Text>
 
-      <View style={buddyManagementStyles.summary}>
-        <Text style={buddyManagementStyles.summaryText}>
-          {buddies.length === 0 
-            ? 'No buddies added yet' 
-            : `${buddies.length} ${buddies.length === 1 ? 'buddy' : 'buddies'} added`
-          }
-        </Text>
-        {buddies.length > 0 && (
-          <View style={buddyManagementStyles.buddyPreview}>
-            {buddies.slice(0, 3).map((buddy, index) => (
-              <Text key={buddy.id} style={buddyManagementStyles.buddyName}>
-                {buddy.name}{index < Math.min(2, buddies.length - 1) ? ', ' : ''}
-              </Text>
-            ))}
-            {buddies.length > 3 && (
-              <Text style={buddyManagementStyles.moreText}>
-                +{buddies.length - 3} more
-              </Text>
-            )}
-          </View>
-        )}
-      </View>
+      {buddies.length > 0 ? (
+        <View style={buddyManagementStyles.buddiesList}>
+          {buddies.map((buddy) => (
+            <TouchableOpacity 
+              key={buddy.id} 
+              style={buddyManagementStyles.buddyItem}
+              onPress={() => onEditBuddy?.(buddy)}
+            >
+              <View style={buddyManagementStyles.buddyInfo}>
+                <Text style={buddyManagementStyles.buddyEmoji}>{randomEmoji()}</Text>
+                <View style={buddyManagementStyles.buddyDetails}>
+                  <Text style={buddyManagementStyles.buddyName}>{buddy.name}</Text>
+                  <Text style={buddyManagementStyles.buddyRelationship}>{buddy.relationship}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      ) : (
+        <View style={buddyManagementStyles.emptyState}>
+          <Text style={buddyManagementStyles.emptyStateText}>
+            No buddies added yet. Tap &quot;Manage Buddies&quot; to get started!
+          </Text>
+        </View>
+      )}
 
       <TouchableOpacity
         style={[globalStyles.button, buddyManagementStyles.manageButton]}
