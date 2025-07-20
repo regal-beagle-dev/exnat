@@ -1,6 +1,7 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React from 'react';
-import { Modal, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, Platform, Text, View } from 'react-native';
+import FormActions from './FormActions';
 import { TimePickerModalProps } from './interfaces';
 import { timePickerStyles } from './styles/TimePickerStyles';
 
@@ -92,17 +93,9 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
       <View style={timePickerStyles.modalOverlay}>
         <View style={timePickerStyles.modalContent}>
           <View style={timePickerStyles.modalHeader}>
-            <TouchableOpacity onPress={onClose} style={timePickerStyles.modalButton}>
-              <Text style={timePickerStyles.modalButtonText}>Cancel</Text>
-            </TouchableOpacity>
             <Text style={timePickerStyles.modalTitle}>
               {hourOnly ? 'Select Hour' : 'Select Time'}
             </Text>
-            <TouchableOpacity onPress={handleConfirm} style={timePickerStyles.modalButton}>
-              <Text style={[timePickerStyles.modalButtonText, timePickerStyles.confirmButton]}>
-                Done
-              </Text>
-            </TouchableOpacity>
           </View>
           <View style={timePickerStyles.pickerContainer}>
             <DateTimePicker
@@ -121,6 +114,14 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
               Minutes will be set to :00
             </Text>
           )}
+          <FormActions
+            onSubmit={handleConfirm}
+            onCancel={onClose}
+            submitButtonText="Done"
+            cancelButtonText="Cancel"
+            showCancelButton={true}
+            isValid={true}
+          />
         </View>
       </View>
     </Modal>

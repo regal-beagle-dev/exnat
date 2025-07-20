@@ -2,6 +2,7 @@ import { API_BASE_URL, USE_MOCK_SERVICES } from '../config/environment';
 import { ActivityService, ApiActivityService, MockActivityService } from './ActivityService';
 import { ApiBuddyService, BuddyService, MockBuddyService } from './BuddyService';
 import { ApiCategoryService, CategoryService, MockCategoryService } from './CategoryService';
+import { ApiSettingsService, MockSettingsService, SettingsService, StorageSettingsService } from './SettingsService';
 import { ApiTimeRangeService, StorageTimeRangeService, TimeRangeService } from './TimeRangeService';
 
 export interface ServiceConfig {
@@ -15,6 +16,7 @@ export class ServiceProvider {
   private categoryService?: CategoryService;
   private buddyService?: BuddyService;
   private timeRangeService?: TimeRangeService;
+  private settingsService?: SettingsService;
 
   constructor(config: ServiceConfig) {
     this.config = config;
@@ -56,12 +58,22 @@ export class ServiceProvider {
     return this.timeRangeService;
   }
 
+  getSettingsService(): SettingsService {
+    if (!this.settingsService) {
+      this.settingsService = this.config.useMocks
+        ? new StorageSettingsService()
+        : new ApiSettingsService(this.config.apiBaseUrl || '');
+    }
+    return this.settingsService;
+  }
+
   updateConfig(config: Partial<ServiceConfig>): void {
     this.config = { ...this.config, ...config };
     this.activityService = undefined;
     this.categoryService = undefined;
     this.buddyService = undefined;
     this.timeRangeService = undefined;
+    this.settingsService = undefined;
   }
 }
 

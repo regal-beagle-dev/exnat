@@ -24,6 +24,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   const buddyService = serviceProvider.getBuddyService();
   const activityService = serviceProvider.getActivityService();
   const categoryService = serviceProvider.getCategoryService();
+  const settingsService = serviceProvider.getSettingsService();
 
   // Define categories first so they can be referenced in activities
   const fitnessCategory: ActivityCategory = { id: '1', name: 'Fitness', emoji: '💪' };
@@ -80,11 +81,12 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
 
   const loadAllData = useCallback(async () => {
     try {
-      const [defaultRanges, allBuddies, allActivities, allCategories] = await Promise.all([
+      const [defaultRanges, allBuddies, allActivities, allCategories, userSettings] = await Promise.all([
         timeRangeService.getDefaultTimeRanges(),
         buddyService.getAllBuddies(),
         activityService.getAllActivities(),
         categoryService.getAllCategories(),
+        settingsService.getUserSettings(),
       ]);
 
       setSettingsData(prev => ({
@@ -93,11 +95,12 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
         buddies: allBuddies,
         activities: allActivities,
         activityCategories: allCategories,
+        useMilitaryTime: userSettings.useMilitaryTime,
       }));
     } catch (error) {
       console.error('Failed to load settings data:', error);
     }
-  }, [timeRangeService, buddyService, activityService, categoryService]);
+  }, [timeRangeService, buddyService, activityService, categoryService, settingsService]);
 
   useFocusEffect(
     useCallback(() => {
@@ -105,11 +108,16 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
     }, [loadAllData])
   );
 
-  const handleTimeFormatToggle = (useMilitaryTime: boolean) => {
-    setSettingsData(prev => ({
-      ...prev,
-      useMilitaryTime,
-    }));
+  const handleTimeFormatToggle = async (useMilitaryTime: boolean) => {
+    try {
+      await settingsService.setUserMilitaryTimeSetting(useMilitaryTime);
+      setSettingsData(prev => ({
+        ...prev,
+        useMilitaryTime,
+      }));
+    } catch (error) {
+      console.error('Failed to update military time setting:', error);
+    }
   };
 
   const handleMorningRangeChange = (range: { start: number; end: number }) => {

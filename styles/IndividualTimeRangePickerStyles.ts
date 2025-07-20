@@ -17,8 +17,6 @@ export const individualTimeRangePickerStyles = StyleSheet.create({
     width: '90%',
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
     paddingBottom: 16,
@@ -29,19 +27,7 @@ export const individualTimeRangePickerStyles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: Colors.text,
-    flex: 1,
     textAlign: 'center',
-  },
-  modalButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  modalButtonText: {
-    fontSize: 16,
-    color: Colors.primary,
-  },
-  confirmButton: {
-    fontWeight: '600',
   },
   dateText: {
     fontSize: 16,

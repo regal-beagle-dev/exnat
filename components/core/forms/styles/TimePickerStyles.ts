@@ -15,8 +15,6 @@ export const timePickerStyles = StyleSheet.create({
     ...Shadows.lg,
   },
   modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
@@ -27,17 +25,6 @@ export const timePickerStyles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: Colors.text,
-  },
-  modalButton: {
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-  },
-  modalButtonText: {
-    fontSize: 16,
-    color: Colors.primary,
-  },
-  confirmButton: {
-    fontWeight: '600',
   },
   pickerContainer: {
     paddingHorizontal: Spacing.lg,

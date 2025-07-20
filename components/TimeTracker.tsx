@@ -50,8 +50,10 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
   const [timeMode, setTimeMode] = useState<'AM' | 'PM'>('AM');
   const [lastPressTime, setLastPressTime] = useState(0);
   const [defaultTimeRanges, setDefaultTimeRanges] = useState<DefaultTimeRanges | null>(null);
+  const [useMilitaryTime, setUseMilitaryTime] = useState(false);
 
   const timeRangeService = serviceProvider.getTimeRangeService();
+  const settingsService = serviceProvider.getSettingsService();
 
   useEffect(() => {
     const loadDefaultTimeRanges = async () => {
@@ -63,36 +65,18 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
       }
     };
 
-    loadDefaultTimeRanges();
-  }, [timeRangeService]);
-
-  const handleApplyDefaultRanges = useCallback(async () => {
-    if (!defaultTimeRanges) return;
-
-    try {
-      clearAllRanges();
-      
-      const morningResult = addCustomTimeRange(
-        `${defaultTimeRanges.morning.start.toString().padStart(2, '0')}:00`,
-        `${defaultTimeRanges.morning.end.toString().padStart(2, '0')}:00`
-      );
-      
-      const eveningResult = addCustomTimeRange(
-        `${defaultTimeRanges.evening.start.toString().padStart(2, '0')}:00`,
-        `${defaultTimeRanges.evening.end.toString().padStart(2, '0')}:00`
-      );
-
-      if (!morningResult.success || !eveningResult.success) {
-        Alert.alert('Error', 'Failed to apply default time ranges');
-        return;
+    const loadUserSettings = async () => {
+      try {
+        const militaryTime = await settingsService.getUserMilitaryTimeSetting();
+        setUseMilitaryTime(militaryTime);
+      } catch (error) {
+        console.error('Failed to load user settings:', error);
       }
+    };
 
-      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (error) {
-      console.error('Failed to apply default ranges:', error);
-      Alert.alert('Error', 'Failed to apply default time ranges');
-    }
-  }, [defaultTimeRanges, clearAllRanges, addCustomTimeRange]);
+    loadDefaultTimeRanges();
+    loadUserSettings();
+  }, [timeRangeService, settingsService]);
 
   const handleApplyCustomDayRanges = useCallback(async (ranges: DefaultTimeRanges) => {
     try {
@@ -322,6 +306,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
         onClose={() => setShowDayRangeForm(false)}
         onApply={handleApplyCustomDayRanges}
         initialRanges={defaultTimeRanges || undefined}
+        useMilitaryTime={useMilitaryTime}
         date={getCurrentDate()}
       />
     </LinearGradient>

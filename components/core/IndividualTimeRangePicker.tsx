@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, Text, View } from 'react-native';
 import { DefaultTimeRanges } from '../../services/TimeRangeService';
 import { individualTimeRangePickerStyles } from '../../styles/IndividualTimeRangePickerStyles';
+import { FormActions } from './forms';
 import TimeRangePicker from './TimeRangePicker';
 import { IndividualTimeRangePickerProps } from './interfaces';
 
@@ -62,15 +63,7 @@ const IndividualTimeRangePicker: React.FC<IndividualTimeRangePickerProps> = ({
       <View style={individualTimeRangePickerStyles.modalOverlay}>
         <View style={individualTimeRangePickerStyles.modalContent}>
           <View style={individualTimeRangePickerStyles.modalHeader}>
-            <TouchableOpacity onPress={onClose} style={individualTimeRangePickerStyles.modalButton}>
-              <Text style={individualTimeRangePickerStyles.modalButtonText}>Cancel</Text>
-            </TouchableOpacity>
             <Text style={individualTimeRangePickerStyles.modalTitle}>Customize Day Schedule</Text>
-            <TouchableOpacity onPress={handleApply} style={individualTimeRangePickerStyles.modalButton}>
-              <Text style={[individualTimeRangePickerStyles.modalButtonText, individualTimeRangePickerStyles.confirmButton]}>
-                Apply
-              </Text>
-            </TouchableOpacity>
           </View>
 
           <Text style={individualTimeRangePickerStyles.dateText}>
@@ -96,6 +89,15 @@ const IndividualTimeRangePicker: React.FC<IndividualTimeRangePickerProps> = ({
               timePeriod="PM"
             />
           </View>
+
+          <FormActions
+            onSubmit={handleApply}
+            onCancel={onClose}
+            submitButtonText="Apply"
+            cancelButtonText="Cancel"
+            showCancelButton={true}
+            isValid={true}
+          />
         </View>
       </View>
     </Modal>
