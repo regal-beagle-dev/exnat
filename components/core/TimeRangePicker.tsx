@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { defaultTimeRangesStyles } from '../../styles/DefaultTimeRangesStyles';
-import TimePickerModal from './forms/TimePickerModal';
+import { HourPicker } from './forms';
 import { TimeRangePickerProps } from './interfaces';
 
 const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
@@ -25,29 +25,6 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
     return `${hour - 12}:00 PM`;
   };
 
-  const createTimeFromHour = (hour: number): Date => {
-    const date = new Date();
-    date.setHours(hour, 0, 0, 0);
-    return date;
-  };
-
-  const createMinMaxTimes = () => {
-    const { min, max } = getValidTimeRange();
-    const today = new Date();
-    
-    const minTime = new Date(today);
-    minTime.setHours(min, 0, 0, 0);
-    
-    const maxTime = new Date(today);
-    maxTime.setHours(max, 59, 59, 999);
-    
-    return { minTime, maxTime };
-  };
-
-  const extractHourFromTime = (time: Date): number => {
-    return time.getHours();
-  };
-
   const getValidTimeRange = () => {
     if (timePeriod === 'AM') {
       return { min: 0, max: 11 };
@@ -62,9 +39,8 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
     return Math.max(min, Math.min(max, hour));
   };
 
-  const handleStartTimeChange = (time: Date) => {
-    const rawStartHour = extractHourFromTime(time);
-    const startHour = constrainHourToTimePeriod(rawStartHour);
+  const handleStartHourChange = (hour: number) => {
+    const startHour = constrainHourToTimePeriod(hour);
     const { min, max } = getValidTimeRange();
     
     let newRange = { ...range, start: startHour };
@@ -81,12 +57,10 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
     }
     
     onRangeChange(newRange);
-    setShowStartPicker(false);
   };
 
-  const handleEndTimeChange = (time: Date) => {
-    const rawEndHour = extractHourFromTime(time);
-    const endHour = constrainHourToTimePeriod(rawEndHour);
+  const handleEndHourChange = (hour: number) => {
+    const endHour = constrainHourToTimePeriod(hour);
     const { min, max } = getValidTimeRange();
     
     let newRange = { ...range, end: endHour };
@@ -103,7 +77,6 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
     }
     
     onRangeChange(newRange);
-    setShowEndPicker(false);
   };
 
   return (
@@ -130,24 +103,26 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
         </TouchableOpacity>
       </View>
 
-      <TimePickerModal
+      <HourPicker
         isVisible={showStartPicker}
         onClose={() => setShowStartPicker(false)}
-        onConfirm={handleStartTimeChange}
-        initialTime={createTimeFromHour(range.start)}
+        onConfirm={handleStartHourChange}
+        initialHour={range.start}
         useMilitaryTime={useMilitaryTime}
-        minimumTime={timePeriod ? createMinMaxTimes().minTime : undefined}
-        maximumTime={timePeriod ? createMinMaxTimes().maxTime : undefined}
+        minimumHour={timePeriod ? getValidTimeRange().min : 0}
+        maximumHour={timePeriod ? getValidTimeRange().max : 23}
+        title="Select Start Hour"
       />
 
-      <TimePickerModal
+      <HourPicker
         isVisible={showEndPicker}
         onClose={() => setShowEndPicker(false)}
-        onConfirm={handleEndTimeChange}
-        initialTime={createTimeFromHour(range.end)}
+        onConfirm={handleEndHourChange}
+        initialHour={range.end}
         useMilitaryTime={useMilitaryTime}
-        minimumTime={timePeriod ? createMinMaxTimes().minTime : undefined}
-        maximumTime={timePeriod ? createMinMaxTimes().maxTime : undefined}
+        minimumHour={timePeriod ? getValidTimeRange().min : 0}
+        maximumHour={timePeriod ? getValidTimeRange().max : 23}
+        title="Select End Hour"
       />
     </View>
   );

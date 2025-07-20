@@ -10,28 +10,62 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
   onConfirm,
   initialTime = new Date(),
   mode = 'time',
-  useMilitaryTime = false,
+  useMilitaryTime = true,
   minimumTime,
   maximumTime,
+  hourOnly = false,
 }) => {
-  const [selectedTime, setSelectedTime] = React.useState(initialTime);
+  const [selectedTime, setSelectedTime] = React.useState(() => {
+    const time = new Date(initialTime);
+    if (hourOnly) {
+      time.setMinutes(0, 0, 0);
+    }
+    return time;
+  });
 
   const handleTimeChange = (event: any, selectedDate?: Date) => {
-    if (Platform.OS === 'android') {
-      onClose();
-      if (event.type === 'set' && selectedDate) {
-        onConfirm(selectedDate);
+    if (selectedDate) {
+      const newTime = new Date(selectedDate);
+      if (hourOnly) {
+        newTime.setMinutes(0, 0, 0);
       }
-    } else {
-      if (selectedDate) {
-        setSelectedTime(selectedDate);
+
+      if (Platform.OS === 'android') {
+        onClose();
+        if (event.type === 'set') {
+          onConfirm(newTime);
+        }
+      } else {
+        setSelectedTime(newTime);
       }
     }
   };
 
   const handleConfirm = () => {
-    onConfirm(selectedTime);
+    const finalTime = new Date(selectedTime);
+    if (hourOnly) {
+      finalTime.setMinutes(0, 0, 0);
+    }
+    onConfirm(finalTime);
     onClose();
+  };
+
+  const getMinimumTime = () => {
+    if (!minimumTime) return undefined;
+    const min = new Date(minimumTime);
+    if (hourOnly) {
+      min.setMinutes(0, 0, 0);
+    }
+    return min;
+  };
+
+  const getMaximumTime = () => {
+    if (!maximumTime) return undefined;
+    const max = new Date(maximumTime);
+    if (hourOnly) {
+      max.setMinutes(59, 59, 999);
+    }
+    return max;
   };
 
   if (Platform.OS === 'android') {
@@ -42,8 +76,8 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
         is24Hour={useMilitaryTime}
         onChange={handleTimeChange}
         display="default"
-        minimumDate={minimumTime}
-        maximumDate={maximumTime}
+        minimumDate={getMinimumTime()}
+        maximumDate={getMaximumTime()}
       />
     ) : null;
   }
@@ -61,7 +95,9 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
             <TouchableOpacity onPress={onClose} style={timePickerStyles.modalButton}>
               <Text style={timePickerStyles.modalButtonText}>Cancel</Text>
             </TouchableOpacity>
-            <Text style={timePickerStyles.modalTitle}>Select Time</Text>
+            <Text style={timePickerStyles.modalTitle}>
+              {hourOnly ? 'Select Hour' : 'Select Time'}
+            </Text>
             <TouchableOpacity onPress={handleConfirm} style={timePickerStyles.modalButton}>
               <Text style={[timePickerStyles.modalButtonText, timePickerStyles.confirmButton]}>
                 Done
@@ -76,10 +112,15 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
               onChange={handleTimeChange}
               display="spinner"
               style={timePickerStyles.picker}
-              minimumDate={minimumTime}
-              maximumDate={maximumTime}
+              minimumDate={getMinimumTime()}
+              maximumDate={getMaximumTime()}
             />
           </View>
+          {hourOnly && (
+            <Text style={timePickerStyles.hourOnlyHint}>
+              Minutes will be set to :00
+            </Text>
+          )}
         </View>
       </View>
     </Modal>

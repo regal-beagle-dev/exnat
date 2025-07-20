@@ -280,7 +280,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
             onPress={() => setShowCustomTime(true)}
           >
             <Text style={[globalStyles.buttonText, timeTrackerStyles.customTimeText]}>
-              ⏱️ Custom Time
+              ⏱️ Enter a Custom Time
             </Text>
           </TouchableOpacity>
 

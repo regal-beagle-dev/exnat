@@ -45,6 +45,13 @@ export const timePickerStyles = StyleSheet.create({
   picker: {
     backgroundColor: Colors.surface,
   },
+  hourOnlyHint: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginTop: Spacing.sm,
+    fontStyle: 'italic',
+  },
   fieldContainer: {
     marginBottom: Spacing.md,
   },

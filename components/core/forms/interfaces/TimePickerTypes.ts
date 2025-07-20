@@ -15,4 +15,5 @@ export interface TimePickerModalProps {
   useMilitaryTime?: boolean;
   minimumTime?: Date;
   maximumTime?: Date;
+  hourOnly?: boolean;
 }
