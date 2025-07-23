@@ -18,6 +18,7 @@ import {
   CustomTimeModal,
   InstructionCard,
   SelectedRangesList,
+  TerminalHourDivider,
   TimeModeToggle,
   TimeSlot,
   TimeTrackerHeader,
@@ -81,28 +82,13 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
   const handleApplyCustomDayRanges = useCallback(async (ranges: DefaultTimeRanges) => {
     try {
       clearAllRanges();
-      
-      const morningResult = addCustomTimeRange(
-        `${ranges.morning.start.toString().padStart(2, '0')}:00`,
-        `${ranges.morning.end.toString().padStart(2, '0')}:00`
-      );
-      
-      const eveningResult = addCustomTimeRange(
-        `${ranges.evening.start.toString().padStart(2, '0')}:00`,
-        `${ranges.evening.end.toString().padStart(2, '0')}:00`
-      );
-
-      if (!morningResult.success || !eveningResult.success) {
-        Alert.alert('Error', 'Failed to apply custom time ranges');
-        return;
-      }
-
+      setDefaultTimeRanges(ranges);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
       console.error('Failed to apply custom day ranges:', error);
       Alert.alert('Error', 'Failed to apply custom time ranges');
     }
-  }, [clearAllRanges, addCustomTimeRange]);
+  }, [clearAllRanges]);
 
   const handleSlotPress = useCallback(async (time: number) => {
     // Debounce rapid successive touches
@@ -187,10 +173,10 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
     });
   };
 
-  const renderTimeSlot = (slot: TimeSlotType, index: number) => {
+  const renderTimeSlot = (slot: TimeSlotType, index: number, filteredSlots: TimeSlotType[]) => {
     const isInRange = isTimeInRange(slot.time);
     const isCurrentlySelected = slot.isSelected;
-    const isFirstIntervalOfHour = Math.abs((slot.time * 3) % 3) < 0.001; // More robust floating point comparison
+    const isFirstIntervalOfHour = Math.abs((slot.time * 3) % 3) < 0.001;
     
     return (
       <TimeSlot
@@ -248,7 +234,31 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
           />
           
           <View style={timeTrackerStyles.calendarContainer}>
-            {getFilteredTimeSlots(timeMode).map((slot, index) => renderTimeSlot(slot, index))}
+            {(() => {
+              const filteredSlots = getFilteredTimeSlots(timeMode, defaultTimeRanges || undefined);
+              const slots = filteredSlots.map((slot, index) => renderTimeSlot(slot, index, filteredSlots));
+              
+              // Add terminal hour divider at the end if we have default ranges
+              if (defaultTimeRanges && filteredSlots.length > 0) {
+                let terminalHour: number;
+                
+                if (timeMode === 'AM') {
+                  terminalHour = Math.floor(defaultTimeRanges.morning.end);
+                } else {
+                  terminalHour = Math.floor(defaultTimeRanges.evening.end);
+                }
+                
+                slots.push(
+                  <TerminalHourDivider
+                    key={`terminal-${terminalHour}`}
+                    hour={terminalHour}
+                    useMilitaryTime={useMilitaryTime}
+                  />
+                );
+              }
+              
+              return slots;
+            })()}
           </View>
         </View>
 

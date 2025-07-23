@@ -199,4 +199,106 @@ describe('useTimeTracker Logic', () => {
       }
     });
   });
+
+  describe('Time Slot Filtering with Default Ranges', () => {
+    const mockTimeSlots = Array.from({ length: 72 }, (_, i) => {
+      const totalMinutes = i * 20;
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      
+      return {
+        time: hours + minutes / 60,
+        isSelected: false,
+      };
+    });
+
+    const getFilteredTimeSlots = (timeMode: 'AM' | 'PM', defaultTimeRanges?: { morning: { start: number; end: number }; evening: { start: number; end: number } }) => {
+      return mockTimeSlots.filter(slot => {
+        const hour = Math.floor(slot.time);
+        
+        if (timeMode === 'AM') {
+          const baseFilter = hour >= 0 && hour < 12;
+          if (!baseFilter) return false;
+          
+          if (defaultTimeRanges) {
+            const morningStart = Math.floor(defaultTimeRanges.morning.start);
+            const morningEnd = Math.floor(defaultTimeRanges.morning.end);
+            return hour >= morningStart && hour < morningEnd;
+          }
+          
+          return true;
+        } else {
+          const baseFilter = hour >= 12 && hour < 24;
+          if (!baseFilter) return false;
+          
+          if (defaultTimeRanges) {
+            const eveningStart = Math.floor(defaultTimeRanges.evening.start);
+            const eveningEnd = Math.floor(defaultTimeRanges.evening.end);
+            return hour >= eveningStart && hour < eveningEnd;
+          }
+          
+          return true;
+        }
+      });
+    };
+
+    test('should filter AM slots based on morning range', () => {
+      const defaultTimeRanges = {
+        morning: { start: 8, end: 10 },
+        evening: { start: 14, end: 18 }
+      };
+      
+      const amSlots = getFilteredTimeSlots('AM', defaultTimeRanges);
+      
+      amSlots.forEach(slot => {
+        const hour = Math.floor(slot.time);
+        expect(hour).toBeGreaterThanOrEqual(8);
+        expect(hour).toBeLessThan(10);
+      });
+    });
+
+    test('should filter PM slots based on evening range', () => {
+      const defaultTimeRanges = {
+        morning: { start: 8, end: 10 },
+        evening: { start: 14, end: 18 }
+      };
+      
+      const pmSlots = getFilteredTimeSlots('PM', defaultTimeRanges);
+      
+      pmSlots.forEach(slot => {
+        const hour = Math.floor(slot.time);
+        expect(hour).toBeGreaterThanOrEqual(14);
+        expect(hour).toBeLessThan(18);
+      });
+    });
+
+    test('should show all slots when no default ranges provided', () => {
+      const amSlots = getFilteredTimeSlots('AM');
+      const pmSlots = getFilteredTimeSlots('PM');
+      
+      const amHours = amSlots.map(slot => Math.floor(slot.time));
+      const pmHours = pmSlots.map(slot => Math.floor(slot.time));
+      
+      expect(amHours).toContain(0);
+      expect(amHours).toContain(11);
+      expect(pmHours).toContain(12);
+      expect(pmHours).toContain(23);
+    });
+
+    test('should handle edge case with narrow time ranges', () => {
+      const defaultTimeRanges = {
+        morning: { start: 9, end: 10 },
+        evening: { start: 15, end: 16 }
+      };
+      
+      const amSlots = getFilteredTimeSlots('AM', defaultTimeRanges);
+      const pmSlots = getFilteredTimeSlots('PM', defaultTimeRanges);
+      
+      const amHours = [...new Set(amSlots.map(slot => Math.floor(slot.time)))];
+      const pmHours = [...new Set(pmSlots.map(slot => Math.floor(slot.time)))];
+      
+      expect(amHours).toEqual([9]);
+      expect(pmHours).toEqual([15]);
+    });
+  });
 });

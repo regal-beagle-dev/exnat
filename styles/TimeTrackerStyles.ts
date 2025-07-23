@@ -183,6 +183,12 @@ export const timeTrackerStyles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.textSecondary,
   },
+  terminalHourText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.primary,
+    textAlign: 'center',
+  },
   timeTextActive: {
     color: Colors.primary,
     fontWeight: 'bold',
@@ -337,5 +343,22 @@ export const timeTrackerStyles = StyleSheet.create({
     color: Colors.surface,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  terminalDividerContainer: {
+    position: 'relative',
+    marginVertical: Spacing.xs,
+  },
+  terminalHourLabel: {
+    position: 'absolute',
+    right: Spacing.md,
+    top: -8,
+    backgroundColor: Colors.surface,
+    paddingHorizontal: Spacing.xs,
+    borderRadius: BorderRadius.sm,
+    shadowColor: Colors.textSecondary,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
 });

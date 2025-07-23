@@ -182,13 +182,32 @@ export const useTimeTracker = () => {
     setSelectedRanges([]);
   }, []);
 
-  const getFilteredTimeSlots = useCallback((timeMode: 'AM' | 'PM') => {
+  const getFilteredTimeSlots = useCallback((timeMode: 'AM' | 'PM', defaultTimeRanges?: { morning: TimeRange; evening: TimeRange }) => {
     return timeSlots.filter(slot => {
       const hour = Math.floor(slot.time);
+      
       if (timeMode === 'AM') {
-        return hour >= 0 && hour < 12;
+        const baseFilter = hour >= 0 && hour < 12;
+        if (!baseFilter) return false;
+        
+        if (defaultTimeRanges) {
+          const morningStart = Math.floor(defaultTimeRanges.morning.start);
+          const morningEnd = Math.floor(defaultTimeRanges.morning.end);
+          return hour >= morningStart && hour < morningEnd;
+        }
+        
+        return true;
       } else {
-        return hour >= 12 && hour < 24;
+        const baseFilter = hour >= 12 && hour < 24;
+        if (!baseFilter) return false;
+        
+        if (defaultTimeRanges) {
+          const eveningStart = Math.floor(defaultTimeRanges.evening.start);
+          const eveningEnd = Math.floor(defaultTimeRanges.evening.end);
+          return hour >= eveningStart && hour < eveningEnd;
+        }
+        
+        return true;
       }
     });
   }, [timeSlots]);
