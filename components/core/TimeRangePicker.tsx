@@ -16,22 +16,24 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
 
   const formatTime = (hour: number): string => {
     if (useMilitaryTime) {
+      if (hour === 24) return '24:00';
       return `${hour.toString().padStart(2, '0')}:00`;
     }
     
     if (hour === 0) return '12:00 AM';
     if (hour === 12) return '12:00 PM';
+    if (hour === 24) return '12:00 AM';
     if (hour < 12) return `${hour}:00 AM`;
     return `${hour - 12}:00 PM`;
   };
 
   const getValidTimeRange = () => {
     if (timePeriod === 'AM') {
-      return { min: 0, max: 11 };
+      return { min: 0, max: 12 };
     } else if (timePeriod === 'PM') {
-      return { min: 12, max: 23 };
+      return { min: 12, max: 24 };
     }
-    return { min: 0, max: 23 };
+    return { min: 0, max: 24 };
   };
 
   const constrainHourToTimePeriod = (hour: number): number => {
@@ -45,7 +47,7 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
     
     let newRange = { ...range, start: startHour };
     
-    if (startHour >= range.end) {
+    if (startHour > range.end) {
       newRange.end = Math.min(startHour + 1, max);
     }
     
@@ -65,7 +67,7 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
     
     let newRange = { ...range, end: endHour };
     
-    if (endHour <= range.start) {
+    if (endHour < range.start) {
       newRange.start = Math.max(endHour - 1, min);
     }
     
@@ -110,7 +112,7 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
         initialHour={range.start}
         useMilitaryTime={useMilitaryTime}
         minimumHour={timePeriod ? getValidTimeRange().min : 0}
-        maximumHour={timePeriod ? getValidTimeRange().max : 23}
+        maximumHour={timePeriod ? getValidTimeRange().max : 24}
         title="Select Start Hour"
       />
 
@@ -121,7 +123,7 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
         initialHour={range.end}
         useMilitaryTime={useMilitaryTime}
         minimumHour={timePeriod ? getValidTimeRange().min : 0}
-        maximumHour={timePeriod ? getValidTimeRange().max : 23}
+        maximumHour={timePeriod ? getValidTimeRange().max : 24}
         title="Select End Hour"
       />
     </View>

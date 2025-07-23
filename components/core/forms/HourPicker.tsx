@@ -18,11 +18,13 @@ const HourPicker: React.FC<HourPickerProps> = ({
 
   const formatHour = (hour: number): string => {
     if (useMilitaryTime) {
+      if (hour === 24) return '24';
       return hour.toString().padStart(2, '0');
     }
     
     if (hour === 0) return '12 AM';
     if (hour === 12) return '12 PM';
+    if (hour === 24) return '12 AM';
     if (hour < 12) return `${hour} AM`;
     return `${hour - 12} PM`;
   };

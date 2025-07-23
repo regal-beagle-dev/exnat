@@ -2,8 +2,8 @@ import { API_BASE_URL, USE_MOCK_SERVICES } from '../config/environment';
 import { ActivityService, ApiActivityService, MockActivityService } from './ActivityService';
 import { ApiBuddyService, BuddyService, MockBuddyService } from './BuddyService';
 import { ApiCategoryService, CategoryService, MockCategoryService } from './CategoryService';
-import { ApiSettingsService, MockSettingsService, SettingsService, StorageSettingsService } from './SettingsService';
-import { ApiTimeRangeService, StorageTimeRangeService, TimeRangeService } from './TimeRangeService';
+import { ApiSettingsService, SettingsService, StorageSettingsService } from './SettingsService';
+import { ApiTimeRangeService, MockTimeRangeService, TimeRangeService } from './TimeRangeService';
 
 export interface ServiceConfig {
   useMocks: boolean;
@@ -52,7 +52,7 @@ export class ServiceProvider {
   getTimeRangeService(): TimeRangeService {
     if (!this.timeRangeService) {
       this.timeRangeService = this.config.useMocks
-        ? new StorageTimeRangeService()
+        ? new MockTimeRangeService()
         : new ApiTimeRangeService(this.config.apiBaseUrl || '');
     }
     return this.timeRangeService;
