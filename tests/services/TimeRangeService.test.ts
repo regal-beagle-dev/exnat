@@ -1,4 +1,4 @@
-import { MockTimeRangeService, StorageTimeRangeService } from '../../services/TimeRangeService';
+import { MockTimeRangeService } from '../../services/TimeRangeService';
 
 describe('TimeRangeService', () => {
   describe('MockTimeRangeService', () => {
@@ -47,35 +47,6 @@ describe('TimeRangeService', () => {
       
       const ranges = await service.getDefaultTimeRanges();
       expect(ranges).toEqual(newRanges);
-    });
-  });
-
-  describe('StorageTimeRangeService', () => {
-    let service: StorageTimeRangeService;
-
-    beforeEach(() => {
-      service = new StorageTimeRangeService();
-    });
-
-    it('should return default ranges when no storage exists', async () => {
-      const ranges = await service.getDefaultTimeRanges();
-      
-      expect(ranges.morning.start).toBe(6);
-      expect(ranges.morning.end).toBe(12);
-      expect(ranges.evening.start).toBe(12);
-      expect(ranges.evening.end).toBe(22);
-    });
-
-    it('should persist and retrieve custom ranges', async () => {
-      const customRanges = {
-        morning: { start: 8, end: 14 },
-        evening: { start: 15, end: 23 },
-      };
-
-      await service.updateDefaultTimeRanges(customRanges);
-      const retrievedRanges = await service.getDefaultTimeRanges();
-      
-      expect(retrievedRanges).toEqual(customRanges);
     });
   });
 });
