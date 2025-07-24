@@ -356,8 +356,8 @@ export const timeTrackerStyles = StyleSheet.create({
   },
   terminalHourLabel: {
     position: 'absolute',
-    left: Spacing.md,
     top: -12,
+    alignSelf: 'center',
     backgroundColor: Colors.textSecondary,
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.xs,

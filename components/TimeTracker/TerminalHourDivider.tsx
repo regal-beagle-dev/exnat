@@ -13,15 +13,15 @@ const TerminalHourDivider: React.FC<TerminalHourDividerProps> = ({
 }) => {
   const formatHour = (hour: number): string => {
     if (useMilitaryTime) {
-      if (hour === 24) return '2400';
-      return `${hour.toString().padStart(2, '0')}00`;
+      if (hour === 24) return '24:00';
+      return `${hour.toString().padStart(2, '0')}:00`;
     }
     
-    if (hour === 12) return '12PM';
-    if (hour === 0) return '12AM';
-    if (hour === 24) return '12AM';
-    if (hour < 12) return `${hour}AM`;
-    return `${hour - 12}PM`;
+    if (hour === 12) return '12 PM';
+    if (hour === 0) return '12 AM';
+    if (hour === 24) return '12 AM';
+    if (hour < 12) return `${hour} AM`;
+    return `${hour - 12} PM`;
   };
 
   return (
