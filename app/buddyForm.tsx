@@ -5,12 +5,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FormHeader } from '../components/common';
 import { Form, LoadingState } from '../components/core/forms';
 import {
-    BuddyFormConfig,
-    BuddyFormData,
-    getBuddyFormDefaultValues,
-    getBuddyFormFields,
+  BuddyFormConfig,
+  BuddyFormData,
+  getBuddyFormDefaultValues,
+  getBuddyFormFields,
 } from '../components/Settings/forms/BuddyForms';
 import { Buddy } from '../components/Settings/interfaces';
+import { FEATURES } from '../config/environment';
 import { globalStyles } from '../constants/Theme';
 import { serviceProvider } from '../services';
 
@@ -25,6 +26,15 @@ export default function BuddyFormScreen() {
   const buddyId = params.buddyId as string;
   
   const buddyService = serviceProvider.getBuddyService();
+
+  // Check if buddies feature is enabled - redirect if not
+  useEffect(() => {
+    if (!FEATURES.ENABLE_BUDDIES) {
+      Alert.alert('Feature Not Available', 'Buddies feature is not enabled', [
+        { text: 'OK', onPress: () => router.back() }
+      ]);
+    }
+  }, [router]);
 
   useEffect(() => {
     if (mode === 'update' && buddyId) {

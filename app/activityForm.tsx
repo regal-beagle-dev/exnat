@@ -11,6 +11,7 @@ import {
   getActivityFormFields,
 } from '../components/Settings/forms/ActivityForms';
 import { Activity } from '../components/Settings/interfaces';
+import { FEATURES } from '../config/environment';
 import { globalStyles } from '../constants/Theme';
 import { serviceProvider } from '../services';
 
@@ -25,6 +26,15 @@ export default function ActivityFormScreen() {
   const activityId = params.activityId as string;
   
   const activityService = serviceProvider.getActivityService();
+
+  // Check if activities feature is enabled - redirect if not
+  useEffect(() => {
+    if (!FEATURES.ENABLE_ACTIVITIES) {
+      Alert.alert('Feature Not Available', 'Activities feature is not enabled', [
+        { text: 'OK', onPress: () => router.back() }
+      ]);
+    }
+  }, [router]);
 
   useEffect(() => {
     if (mode === 'update' && activityId) {

@@ -2,6 +2,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { ScrollView, View } from 'react-native';
+import { FEATURES } from '../config/environment';
 import { globalStyles } from '../constants/Theme';
 import { serviceProvider } from '../services';
 import ActivityDetailManager from './Settings/ActivityDetailManager';
@@ -21,10 +22,11 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   const [showActivityDetailManager, setShowActivityDetailManager] = useState(false);
 
   const timeRangeService = serviceProvider.getTimeRangeService();
-  const buddyService = serviceProvider.getBuddyService();
-  const activityService = serviceProvider.getActivityService();
-  const categoryService = serviceProvider.getCategoryService();
   const settingsService = serviceProvider.getSettingsService();
+  
+  const buddyService = FEATURES.ENABLE_BUDDIES ? serviceProvider.getBuddyService() : null;
+  const activityService = FEATURES.ENABLE_ACTIVITIES ? serviceProvider.getActivityService() : null;
+  const categoryService = FEATURES.ENABLE_ACTIVITIES ? serviceProvider.getCategoryService() : null;
 
   // Define categories first so they can be referenced in activities
   const fitnessCategory: ActivityCategory = { id: '1', name: 'Fitness', emoji: '💪' };
@@ -81,21 +83,45 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
 
   const loadAllData = useCallback(async () => {
     try {
-      const [defaultRanges, allBuddies, allActivities, allCategories, userSettings] = await Promise.all([
+      const promises: Promise<any>[] = [
         timeRangeService.getDefaultTimeRanges(),
-        buddyService.getAllBuddies(),
-        activityService.getAllActivities(),
-        categoryService.getAllCategories(),
         settingsService.getUserSettings(),
-      ]);
+      ];
+
+      if (FEATURES.ENABLE_BUDDIES && buddyService) {
+        promises.push(buddyService.getAllBuddies());
+      }
+
+      if (FEATURES.ENABLE_ACTIVITIES && activityService && categoryService) {
+        promises.push(
+          activityService.getAllActivities(),
+          categoryService.getAllCategories()
+        );
+      }
+
+      const results = await Promise.all(promises);
+      
+      let resultIndex = 0;
+      const defaultRanges = results[resultIndex++];
+      const userSettings = results[resultIndex++];
+      
+      const updateData: Partial<typeof settingsData> = {
+        defaultTimeRanges: defaultRanges,
+        useMilitaryTime: userSettings.useMilitaryTime,
+      };
+
+      if (FEATURES.ENABLE_BUDDIES && buddyService) {
+        updateData.buddies = results[resultIndex++];
+      }
+
+      if (FEATURES.ENABLE_ACTIVITIES && activityService && categoryService) {
+        updateData.activities = results[resultIndex++];
+        updateData.activityCategories = results[resultIndex++];
+      }
 
       setSettingsData(prev => ({
         ...prev,
-        defaultTimeRanges: defaultRanges,
-        buddies: allBuddies,
-        activities: allActivities,
-        activityCategories: allCategories,
-        useMilitaryTime: userSettings.useMilitaryTime,
+        ...updateData,
       }));
     } catch (error) {
       console.error('Failed to load settings data:', error);
@@ -142,7 +168,9 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
 
   // Activity handlers
   const handleNavigateToActivityManager = () => {
-    setShowActivityDetailManager(true);
+    if (FEATURES.ENABLE_ACTIVITIES) {
+      setShowActivityDetailManager(true);
+    }
   };
 
   const handleCloseActivityManager = () => {
@@ -150,6 +178,8 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   };
 
   const handleAddActivity = (activity: Omit<Activity, 'id'>) => {
+    if (!FEATURES.ENABLE_ACTIVITIES) return;
+    
     const newActivity: Activity = {
       ...activity,
       id: Date.now().toString(),
@@ -162,6 +192,8 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   };
 
   const handleRemoveActivity = (id: string) => {
+    if (!FEATURES.ENABLE_ACTIVITIES) return;
+    
     setSettingsData(prev => ({
       ...prev,
       activities: prev.activities.filter(activity => activity.id !== id),
@@ -169,6 +201,8 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   };
 
   const handleToggleActivityVisibility = (id: string) => {
+    if (!FEATURES.ENABLE_ACTIVITIES) return;
+    
     setSettingsData(prev => ({
       ...prev,
       activities: prev.activities.map(activity =>
@@ -180,6 +214,8 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   };
 
   const handleAddCategory = (category: Omit<ActivityCategory, 'id'>) => {
+    if (!FEATURES.ENABLE_ACTIVITIES) return;
+    
     const newCategory: ActivityCategory = {
       ...category,
       id: Date.now().toString(),
@@ -192,6 +228,8 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   };
 
   const handleRemoveCategory = (id: string) => {
+    if (!FEATURES.ENABLE_ACTIVITIES) return;
+    
     setSettingsData(prev => ({
       ...prev,
       activityCategories: prev.activityCategories.filter(category => category.id !== id),
@@ -200,7 +238,9 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
 
   // Buddy handlers
   const handleNavigateToBuddyManager = () => {
-    setShowBuddyManager(true);
+    if (FEATURES.ENABLE_BUDDIES) {
+      setShowBuddyManager(true);
+    }
   };
 
   const handleCloseBuddyManager = () => {
@@ -208,6 +248,8 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   };
 
   const handleAddBuddy = (buddy: Omit<Buddy, 'id'>) => {
+    if (!FEATURES.ENABLE_BUDDIES) return;
+    
     const newBuddy: Buddy = {
       ...buddy,
       id: Date.now().toString(),
@@ -220,6 +262,8 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   };
 
   const handleRemoveBuddy = (id: string) => {
+    if (!FEATURES.ENABLE_BUDDIES) return;
+    
     setSettingsData(prev => ({
       ...prev,
       buddies: prev.buddies.filter(buddy => buddy.id !== id),
@@ -227,14 +271,18 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
   };
 
   const handleEditActivity = (activity: Activity) => {
-    router.push(`/activityForm?mode=update&activityId=${activity.id}`);
+    if (FEATURES.ENABLE_ACTIVITIES) {
+      router.push(`/activityForm?mode=update&activityId=${activity.id}`);
+    }
   };
 
   const handleEditBuddy = (buddy: Buddy) => {
-    router.push(`/buddyForm?mode=update&buddyId=${buddy.id}`);
+    if (FEATURES.ENABLE_BUDDIES) {
+      router.push(`/buddyForm?mode=update&buddyId=${buddy.id}`);
+    }
   };
 
-  if (showActivityDetailManager) {
+  if (FEATURES.ENABLE_ACTIVITIES && showActivityDetailManager) {
     return (
       <ActivityDetailManager
         onClose={handleCloseActivityManager}
@@ -249,7 +297,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
     );
   }
 
-  if (showBuddyManager) {
+  if (FEATURES.ENABLE_BUDDIES && showBuddyManager) {
     return (
       <BuddyManager
         onClose={handleCloseBuddyManager}
@@ -285,22 +333,26 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
           />
         </SettingsSection>
 
-        <SettingsSection title="Activities">
-          <ActivityManager
-            activities={settingsData.activities}
-            categories={settingsData.activityCategories}
-            onNavigateToActivityManager={handleNavigateToActivityManager}
-            onEditActivity={handleEditActivity}
-          />
-        </SettingsSection>
+        {FEATURES.ENABLE_ACTIVITIES && (
+          <SettingsSection title="Activities">
+            <ActivityManager
+              activities={settingsData.activities}
+              categories={settingsData.activityCategories}
+              onNavigateToActivityManager={handleNavigateToActivityManager}
+              onEditActivity={handleEditActivity}
+            />
+          </SettingsSection>
+        )}
 
-        <SettingsSection title="Buddy Management">
-          <BuddyManagement
-            buddies={settingsData.buddies}
-            onNavigateToBuddyManager={handleNavigateToBuddyManager}
-            onEditBuddy={handleEditBuddy}
-          />
-        </SettingsSection>
+        {FEATURES.ENABLE_BUDDIES && (
+          <SettingsSection title="Buddy Management">
+            <BuddyManagement
+              buddies={settingsData.buddies}
+              onNavigateToBuddyManager={handleNavigateToBuddyManager}
+              onEditBuddy={handleEditBuddy}
+            />
+          </SettingsSection>
+        )}
       </ScrollView>
     </View>
   );
