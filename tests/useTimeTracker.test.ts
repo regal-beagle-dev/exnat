@@ -154,6 +154,36 @@ describe('useTimeTracker Logic', () => {
     });
   });
 
+  describe('Time Formatting with Military Time Setting', () => {
+    const formatTimeWithSetting = (time: number, useMilitaryTime: boolean): string => {
+      const hours = Math.floor(time);
+      const minutes = Math.round((time - hours) * 60);
+      
+      if (useMilitaryTime) {
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      } else {
+        const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+        const ampm = hours < 12 ? 'AM' : 'PM';
+        return `${hour12}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+      }
+    };
+
+    test('Military time formatting should work correctly', () => {
+      expect(formatTimeWithSetting(8.0, true)).toBe('08:00');
+      expect(formatTimeWithSetting(13.0, true)).toBe('13:00');
+      expect(formatTimeWithSetting(0.0, true)).toBe('00:00');
+      expect(formatTimeWithSetting(23 + 40/60, true)).toBe('23:40');
+    });
+
+    test('Regular time formatting should work correctly', () => {
+      expect(formatTimeWithSetting(8.0, false)).toBe('8:00 AM');
+      expect(formatTimeWithSetting(13.0, false)).toBe('1:00 PM');
+      expect(formatTimeWithSetting(0.0, false)).toBe('12:00 AM');
+      expect(formatTimeWithSetting(12.0, false)).toBe('12:00 PM');
+      expect(formatTimeWithSetting(23 + 40/60, false)).toBe('11:40 PM');
+    });
+  });
+
   describe('Interval Calculations', () => {
     test('20-minute intervals should be calculated correctly', () => {
       expect(MINUTES_PER_INTERVAL).toBe(20);

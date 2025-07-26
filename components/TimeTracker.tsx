@@ -26,6 +26,15 @@ import {
 import { TimeTrackerProps } from './TimeTracker/props';
 
 const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose }) => {
+  const [showCustomTime, setShowCustomTime] = useState(false);
+  const [showDayRangeForm, setShowDayRangeForm] = useState(false);
+  const [customStartTime, setCustomStartTime] = useState('');
+  const [customEndTime, setCustomEndTime] = useState('');
+  const [timeMode, setTimeMode] = useState<'AM' | 'PM'>('AM');
+  const [lastPressTime, setLastPressTime] = useState(0);
+  const [defaultTimeRanges, setDefaultTimeRanges] = useState<DefaultTimeRanges | null>(null);
+  const [useMilitaryTime, setUseMilitaryTime] = useState(false);
+  
   const {
     selectedRanges,
     isSelecting,
@@ -42,16 +51,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
     removeRange,
     getFilteredTimeSlots,
     clearAllRanges,
-  } = useTimeTracker();
-
-  const [showCustomTime, setShowCustomTime] = useState(false);
-  const [showDayRangeForm, setShowDayRangeForm] = useState(false);
-  const [customStartTime, setCustomStartTime] = useState('');
-  const [customEndTime, setCustomEndTime] = useState('');
-  const [timeMode, setTimeMode] = useState<'AM' | 'PM'>('AM');
-  const [lastPressTime, setLastPressTime] = useState(0);
-  const [defaultTimeRanges, setDefaultTimeRanges] = useState<DefaultTimeRanges | null>(null);
-  const [useMilitaryTime, setUseMilitaryTime] = useState(false);
+  } = useTimeTracker(useMilitaryTime);
 
   const timeRangeService = serviceProvider.getTimeRangeService();
   const settingsService = serviceProvider.getSettingsService();
@@ -221,7 +221,9 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
         )}
 
         <View style={[globalStyles.card, timeTrackerStyles.timeGrid]}>
-          <Text style={timeTrackerStyles.gridTitle}>Select Hours (24-hour format)</Text>
+          <Text style={timeTrackerStyles.gridTitle}>
+            Select Hours ({useMilitaryTime ? '24-hour' : '12-hour'} format)
+          </Text>
           {isSelecting && (
             <Text style={timeTrackerStyles.selectionHint}>
               Now tap the end time to complete your selection

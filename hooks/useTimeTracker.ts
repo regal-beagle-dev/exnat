@@ -10,7 +10,7 @@ export const MINUTES_PER_INTERVAL = 20;
 export const INTERVALS_PER_HOUR = 60 / MINUTES_PER_INTERVAL; // 3 intervals per hour
 export const TOTAL_INTERVALS = 24 * INTERVALS_PER_HOUR; // 72 total intervals in a day
 
-export const useTimeTracker = () => {
+export const useTimeTracker = (useMilitaryTime: boolean = false) => {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(
     Array.from({ length: TOTAL_INTERVALS }, (_, i) => {
       // Calculate hours and minutes precisely to avoid floating point errors
@@ -31,8 +31,15 @@ export const useTimeTracker = () => {
   const formatTime = useCallback((time: number): string => {
     const hours = Math.floor(time);
     const minutes = Math.round((time - hours) * 60);
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  }, []);
+    
+    if (useMilitaryTime) {
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    } else {
+      const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+      const ampm = hours < 12 ? 'AM' : 'PM';
+      return `${hour12}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+    }
+  }, [useMilitaryTime]);
 
   const parseTimeInput = useCallback((timeStr: string): number | null => {
     const match = timeStr.match(/^(\d{1,2}):(\d{2})$/);
@@ -47,15 +54,22 @@ export const useTimeTracker = () => {
   }, []);
 
   const formatTimeRange = useCallback((start: number, end: number): string => {
-    const formatTime = (time: number) => {
+    const formatTimeForRange = (time: number) => {
       const totalMinutes = Math.round(time * 60);
       const hours = Math.floor(totalMinutes / 60);
       const minutes = totalMinutes % 60;
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      
+      if (useMilitaryTime) {
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      } else {
+        const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+        const ampm = hours < 12 ? 'AM' : 'PM';
+        return `${hour12}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+      }
     };
     
-    return `${formatTime(start)} - ${formatTime(end)}`;
-  }, []);
+    return `${formatTimeForRange(start)} - ${formatTimeForRange(end)}`;
+  }, [useMilitaryTime]);
 
   const calculateIntervalBounds = useCallback((startTime: number, endTime: number) => {
     const startInterval = Math.floor(Math.min(startTime, endTime) * INTERVALS_PER_HOUR);
