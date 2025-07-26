@@ -9,7 +9,7 @@ export const timeTrackerStyles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingTop: 60,
+    paddingTop: Spacing.lg,
     paddingBottom: 120,
   },
   header: {

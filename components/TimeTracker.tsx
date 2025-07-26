@@ -197,12 +197,12 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
       colors={[Colors.gradientStart, Colors.gradientEnd]}
       style={timeTrackerStyles.container}
     >
+      <Header
+        title=""
+        onBack={onClose}
+      />
+      
       <ScrollView contentContainerStyle={timeTrackerStyles.scrollContent}>
-        <Header
-          title=""
-          onBack={onClose}
-        />
-
         <View style={timeTrackerStyles.headerContent}>
           <Text style={timeTrackerStyles.title}>Track Your Time Outside</Text>
           <Text style={timeTrackerStyles.date}>{getCurrentDateString()}</Text>

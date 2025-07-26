@@ -7,7 +7,7 @@ export const dashboardStyles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingTop: 60,
+    paddingTop: Spacing.xl,
   },
   header: {
     paddingHorizontal: Spacing.lg,
