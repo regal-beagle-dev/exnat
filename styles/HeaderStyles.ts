@@ -26,4 +26,11 @@ export const headerStyles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  subtitle: {
+    color: Colors.surface,
+    fontSize: 14,
+    fontWeight: '400',
+    marginTop: 2,
+    opacity: 0.9,
+  },
 });

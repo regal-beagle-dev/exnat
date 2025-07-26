@@ -7,7 +7,8 @@ import { HeaderProps } from './props';
 export const Header: React.FC<HeaderProps> = ({ 
   title, 
   onBack, 
-  backgroundColor = Colors.primary 
+  backgroundColor = Colors.primary,
+  subtitle 
 }) => {
   return (
     <View style={[headerStyles.header, { backgroundColor }]}>
@@ -19,6 +20,9 @@ export const Header: React.FC<HeaderProps> = ({
       </TouchableOpacity>
       <View style={headerStyles.headerContent}>
         <Text style={headerStyles.title}>{title}</Text>
+        {subtitle && (
+          <Text style={headerStyles.subtitle}>{subtitle}</Text>
+        )}
       </View>
     </View>
   );

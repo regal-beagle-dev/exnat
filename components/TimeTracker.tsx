@@ -13,7 +13,7 @@ import { useTimeTracker, type TimeSlot as TimeSlotType } from '../hooks/useTimeT
 import { serviceProvider } from '../services';
 import { DefaultTimeRanges } from '../services/TimeRangeService';
 import { timeTrackerStyles } from '../styles/TimeTrackerStyles';
-import { IndividualTimeRangePicker } from './core';
+import { Header, IndividualTimeRangePicker } from './core';
 import {
   CustomTimeModal,
   InstructionCard,
@@ -21,7 +21,6 @@ import {
   TerminalHourDivider,
   TimeModeToggle,
   TimeSlot,
-  TimeTrackerHeader,
 } from './TimeTracker/';
 import { TimeTrackerProps } from './TimeTracker/props';
 
@@ -199,11 +198,15 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
       style={timeTrackerStyles.container}
     >
       <ScrollView contentContainerStyle={timeTrackerStyles.scrollContent}>
-        <TimeTrackerHeader
-          title="Track Your Time Outside"
-          date={getCurrentDateString()}
+        <Header
+          title=""
           onBack={onClose}
         />
+
+        <View style={timeTrackerStyles.headerContent}>
+          <Text style={timeTrackerStyles.title}>Track Your Time Outside</Text>
+          <Text style={timeTrackerStyles.date}>{getCurrentDateString()}</Text>
+        </View>
 
         <InstructionCard />
 
