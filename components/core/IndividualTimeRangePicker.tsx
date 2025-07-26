@@ -3,15 +3,15 @@ import { Modal, Text, View } from 'react-native';
 import { DefaultTimeRanges } from '../../services/TimeRangeService';
 import { individualTimeRangePickerStyles } from '../../styles/IndividualTimeRangePickerStyles';
 import { FormActions } from './forms';
-import TimeRangePicker from './TimeRangePicker';
 import { IndividualTimeRangePickerProps } from './interfaces';
+import TimeRangePicker from './TimeRangePicker';
 
 const IndividualTimeRangePicker: React.FC<IndividualTimeRangePickerProps> = ({
   isVisible,
   onClose,
   onApply,
   initialRanges,
-  useMilitaryTime = true,
+  useMilitaryTime = false,
   date = new Date(),
 }) => {
   const [ranges, setRanges] = useState<DefaultTimeRanges>({

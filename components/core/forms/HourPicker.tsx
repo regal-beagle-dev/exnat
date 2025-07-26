@@ -9,7 +9,7 @@ const HourPicker: React.FC<HourPickerProps> = ({
   onClose,
   onConfirm,
   initialHour = 12,
-  useMilitaryTime = true,
+  useMilitaryTime = false,
   minimumHour = 0,
   maximumHour = 23,
   title = 'Select Hour',

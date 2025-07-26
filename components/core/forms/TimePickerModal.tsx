@@ -11,7 +11,7 @@ const TimePickerModal: React.FC<TimePickerModalProps> = ({
   onConfirm,
   initialTime = new Date(),
   mode = 'time',
-  useMilitaryTime = true,
+  useMilitaryTime = false,
   minimumTime,
   maximumTime,
   hourOnly = false,
