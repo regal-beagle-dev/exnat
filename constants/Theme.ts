@@ -31,6 +31,7 @@ export const Colors = {
   timeSlotActive: '#4A7C59',
   timeSlotText: '#2C3E2E',
   timeSlotActiveText: '#FFFFFF',
+  timeSlotSelected: '#ECF6EC',
 };
 
 export const Spacing = {

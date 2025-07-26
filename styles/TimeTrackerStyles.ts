@@ -158,7 +158,7 @@ export const timeTrackerStyles = StyleSheet.create({
     shadowRadius: 2,
   },
   calendarIntervalSelected: {
-    backgroundColor: Colors.primaryLight,
+    backgroundColor: Colors.timeSlotSelected,
     elevation: 3,
     shadowOpacity: 0.15,
     shadowRadius: 4,
