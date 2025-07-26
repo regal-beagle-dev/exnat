@@ -42,7 +42,7 @@ const DefaultTimeRanges: React.FC<DefaultTimeRangesProps> = ({
   return (
     <View style={defaultTimeRangesStyles.container}>
       <Text style={defaultTimeRangesStyles.description}>
-        Set default time ranges that will be pre-selected when tracking time
+        Define which time ranges appear as options when tracking your outdoor time
       </Text>
       
       <TimeRangePicker

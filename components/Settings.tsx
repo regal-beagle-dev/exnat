@@ -323,7 +323,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
           />
         </SettingsSection>
 
-        <SettingsSection title="Default Time Ranges">
+        <SettingsSection title="Available Time Ranges">
           <DefaultTimeRanges
             morningRange={settingsData.defaultTimeRanges.morning}
             eveningRange={settingsData.defaultTimeRanges.evening}

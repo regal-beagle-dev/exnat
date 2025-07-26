@@ -214,7 +214,7 @@ const TimeTracker: React.FC<TimeTrackerProps> = ({ isYesterday = false, onClose 
               onPress={() => setShowDayRangeForm(true)}
             >
               <Text style={[globalStyles.buttonText, timeTrackerStyles.customTimeText]}>
-                📅 Alter AM/PM Ranges
+                📅 Customize Available Ranges
               </Text>
             </TouchableOpacity>
           </View>
