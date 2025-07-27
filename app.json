@@ -1,17 +1,25 @@
 {
   "expo": {
-    "name": "exnat",
+    "name": "Nature Buddy",
     "slug": "exnat",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "exnat",
+    "scheme": "nature-buddy",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "description": "Explore the outside world and track your nature adventures",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.regalbeagle.naturebuddy",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "dev.regalbeagle.naturebuddy",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -37,6 +45,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "6659a1f8-e522-4ecf-8e9a-8fc3f08c20e3"
+      }
     }
   }
 }

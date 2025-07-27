@@ -11,7 +11,8 @@
     "lint": "expo lint",
     "test": "bunx jest",
     "test:watch": "bunx jest --watch",
-    "test:bun": "bun test"
+    "test:bun": "bun test",
+    "dev-ios": "eas build --platform ios --profile development"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -23,6 +24,7 @@
     "expo": "~53.0.20",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
+    "expo-dev-client": "~5.2.4",
     "expo-font": "~13.3.2",
     "expo-haptics": "~14.1.4",
     "expo-image": "~2.3.2",
