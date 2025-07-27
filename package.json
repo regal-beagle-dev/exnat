@@ -12,7 +12,9 @@
     "test": "bunx jest",
     "test:watch": "bunx jest --watch",
     "test:bun": "bun test",
-    "dev-ios": "eas build --platform ios --profile development"
+    "dev-ios": "eas build --platform ios --profile development",
+    "prod-ios": "eas build --platform ios --profile production",
+    "ios-store": "eas submit --platform ios"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
